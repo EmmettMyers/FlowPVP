@@ -3,5 +3,13 @@ body {
     background: #121212;
     color: white;
     user-select: none;
-    overflow-y: hidden;
+    overflow: hidden;
+    -webkit-touch-callout: none;
+}
+
+* {
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
 }

@@ -37,6 +37,8 @@ function Game() {
     const [currentPath, setCurrentPath] = createSignal([]);
 
     const handleStart = (row, col) => (e) => {
+        e.preventDefault();
+
         const value = grid()[row][col];
         const currentColor = colorMapping[value];
         const cellPipe = pipes()[row][col];
@@ -60,6 +62,8 @@ function Game() {
     };
 
     const handleMove = (row, col) => (e) => {
+        e.preventDefault();
+
         if (!dragging()) return;
 
         const path = currentPath();
@@ -82,13 +86,11 @@ function Game() {
 
         const cellValue = grid()[row][col];
         if (cellValue !== 0 && colorMapping[cellValue] !== dragColor()) {
-            cancelDrag();
             return;
         }
 
         const cellPipe = pipes()[row][col];
         if (cellPipe && cellPipe.color !== dragColor()) {
-            cancelDrag();
             return;
         }
 
@@ -146,12 +148,10 @@ function Game() {
     };
 
     onCleanup(() => {
-        window.removeEventListener('mouseup', commitDrag);
-        window.removeEventListener('touchend', commitDrag);
+        window.removeEventListener('pointerup', commitDrag, { passive: false });
     });
 
-    window.addEventListener('mouseup', commitDrag);
-    window.addEventListener('touchend', commitDrag);
+    window.addEventListener('pointerup', commitDrag, { passive: false });
 
     return (
         <div class={styles.Game}>
@@ -160,6 +160,7 @@ function Game() {
                     <div class={styles.row} key={rowIndex}>
                         {row.map((value, colIndex) => {
                             const pipe = pipes()[rowIndex][colIndex];
+                            const pipeColor = pipe ? pipe.color : dragColor();
                             const isInCurrentPath = currentPath().some(
                                 cell => cell.row === rowIndex && cell.col === colIndex
                             );
@@ -168,11 +169,9 @@ function Game() {
                                 <div
                                     class={styles.cell}
                                     key={colIndex}
-                                    onMouseDown={handleStart(rowIndex, colIndex)}
-                                    onTouchStart={handleStart(rowIndex, colIndex)}
-                                    onMouseEnter={handleMove(rowIndex, colIndex)}
-                                    onTouchMove={handleMove(rowIndex, colIndex)}
-                                    onTouchEnd={commitDrag}
+                                    onPointerDown={handleStart(rowIndex, colIndex)}
+                                    onPointerMove={handleMove(rowIndex, colIndex)}
+                                    onPointerUp={commitDrag}
                                 >
                                     {value !== 0 && (
                                         <div
@@ -193,7 +192,7 @@ function Game() {
                                                             ? pipe.connections
                                                             : getPipeConnections(rowIndex, colIndex, currentPath(), pipes)
                                                 )}
-                                                stroke={pipe ? pipe.color : dragColor()}
+                                                stroke={pipeColor}
                                                 stroke-width="20"
                                                 fill="none"
                                                 opacity={isInCurrentPath && !pipe ? 0.5 : 1}
