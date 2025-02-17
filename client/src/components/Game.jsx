@@ -87,6 +87,38 @@ function Game() {
         return paths.join(' ');
     };
 
+    // Function to find connected cells recursively
+    const findConnectedCells = (r, c, color, path, pipes, setPipes, n) => {
+        if (r < 0 || r >= n || c < 0 || c >= n || pipes()[r][c]?.color !== color) return;
+
+        path.push({ row: r, col: c });
+
+        // Create a new copy of pipes to avoid mutating the signal directly
+        const newPipes = pipes().map(row => row.slice());
+        newPipes[r][c] = null; // mark the cell as cleared
+        setPipes(newPipes); // update pipes signal
+
+        if (r > 0) findConnectedCells(r - 1, c, color, path, pipes, setPipes, n); // top
+        if (r < n - 1) findConnectedCells(r + 1, c, color, path, pipes, setPipes, n); // bottom
+        if (c > 0) findConnectedCells(r, c - 1, color, path, pipes, setPipes, n); // left
+        if (c < n - 1) findConnectedCells(r, c + 1, color, path, pipes, setPipes, n); // right
+    };
+
+    // Function to check if a cell is an edge pipe (only has one connected pipe in all 4 sides)
+    const isEdgePipe = (row, col) => {
+        let connectedCount = 0;
+
+        // Check the four possible neighboring cells
+        if (row > 0 && pipes()[row - 1][col] !== null) connectedCount++; // top
+        if (row < pipes().length - 1 && pipes()[row + 1][col] !== null) connectedCount++; // bottom
+        if (col > 0 && pipes()[row][col - 1] !== null) connectedCount++; // left
+        if (col < pipes().length - 1 && pipes()[row][col + 1] !== null) connectedCount++; // right
+
+        // Return true if exactly one neighbor is connected
+        return connectedCount <= 1;
+    };
+
+
     // Handle mouse down on a cell
     const handleMouseDown = (row, col) => (e) => {
         const value = grid()[row][col];
@@ -100,42 +132,26 @@ function Game() {
         } else {
             setDragging(true);
             setDragColor(currentColor || pipes()[row][col].color);
-            //setCurrentPath([{ row, col }]);
             if (cellPipe === null) {
                 setCurrentPath([{ row, col }]);
-            } else {
-                // this is the case where a new path is being made from an old, incomplete one.
-                // set the current path to the old one, which you will probably have to traverse to find.
-
+            } else if (isEdgePipe(row, col)) {
                 const path = [];
                 const color = cellPipe.color;
-
-                const findConnectedCells = (r, c) => {
-                    if (r < 0 || r >= n || c < 0 || c >= n || pipes()[r][c]?.color !== color) return;
-                    path.push({ row: r, col: c });
-
-                    // Create a new copy of pipes to avoid mutating the signal directly
-                    const newPipes = pipes().map(row => row.slice());
-                    newPipes[r][c] = null; // mark the cell as cleared
-                    setPipes(newPipes); // update pipes signal
-
-                    if (r > 0) findConnectedCells(r - 1, c); // top
-                    if (r < n - 1) findConnectedCells(r + 1, c); // bottom
-                    if (c > 0) findConnectedCells(r, c - 1); // left
-                    if (c < n - 1) findConnectedCells(r, c + 1); // right
-                };
-
-                findConnectedCells(row, col);
+                findConnectedCells(row, col, color, path, pipes, setPipes, n);
                 setCurrentPath(path.reverse());
             }
         }
     };
+
 
     // Handle mouse enter on a cell
     const handleMouseEnter = (row, col) => (e) => {
         if (!dragging()) return;
 
         const path = currentPath();
+
+        if (path.length === 0) return;
+        
         const lastCell = path[path.length - 1];
 
         const inCurrentPath = path.slice(0, -1).some(cell => cell.row === row && cell.col === col);
