@@ -1,23 +1,10 @@
 import { createSignal, onCleanup } from 'solid-js';
 import styles from '../styles/Game.module.css';
-import { checkIfGameWon, findConnectedCells, getPipeConnections, getPipePath, isEdgePipe } from '../utils/gameUtils';
+import { cellColorMapping, checkIfGameWon, findConnectedCells, getPipeConnections, getPipePath, isEdgePipe } from '../utils/gameUtils';
 
 function Game() {
     const n = 5;
-    const colorMapping = {
-        1: 'green',
-        2: 'yellow',
-        3: 'blue',
-        4: 'red',
-        5: 'purple',
-        6: 'orange',
-        7: 'pink',
-        8: 'brown',
-        9: 'cyan',
-        10: 'magenta',
-        11: 'lime',
-        12: 'teal'
-    };
+    const cellSize = String(85.0 / n) + "vw";
 
     const [grid, setGrid] = createSignal(
         [
@@ -40,7 +27,7 @@ function Game() {
         e.preventDefault();
 
         const value = grid()[row][col];
-        const currentColor = colorMapping[value];
+        const currentColor = cellColorMapping[value];
         const cellPipe = pipes()[row][col];
 
         if (value === 0 && cellPipe === null) return;
@@ -86,7 +73,7 @@ function Game() {
         if (path.filter(cell => grid()[cell.row][cell.col] !== 0).length >= 2) return;
 
         const cellValue = grid()[row][col];
-        if (cellValue !== 0 && colorMapping[cellValue] !== dragColor()) {
+        if (cellValue !== 0 && cellColorMapping[cellValue] !== dragColor()) {
             return;
         }
 
@@ -181,6 +168,7 @@ function Game() {
                             return (
                                 <div
                                     class={styles.cell}
+                                    style={{ width: cellSize, height: cellSize }}
                                     key={colIndex}
                                     onPointerDown={handleStart(rowIndex, colIndex)}
                                     onPointerMove={handleMove(rowIndex, colIndex)}
@@ -189,8 +177,8 @@ function Game() {
                                     {value !== 0 && (
                                         <div
                                             style={{
-                                                background: colorMapping[value],
-                                                "box-shadow": pipe ? `0 0 10px 5px ${colorMapping[value]}` : 'none',
+                                                background: cellColorMapping[value],
+                                                "box-shadow": pipe ? `0 0 10px 5px ${cellColorMapping[value]}` : 'none',
                                             }}
                                             class={styles.circle}
                                         />

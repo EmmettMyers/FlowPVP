@@ -1,3 +1,18 @@
+export const cellColorMapping = {
+    1: 'green',
+    2: 'yellow',
+    3: 'blue',
+    4: 'red',
+    5: 'purple',
+    6: 'orange',
+    7: 'pink',
+    8: 'brown',
+    9: 'cyan',
+    10: 'magenta',
+    11: 'lime',
+    12: 'teal'
+};
+
 export const getPipeConnections = (row, col, path, pipes) => {
     const connections = { top: false, right: false, bottom: false, left: false };
     const index = path.findIndex(cell => cell.row === row && cell.col === col);

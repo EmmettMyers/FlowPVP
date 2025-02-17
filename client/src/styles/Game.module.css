@@ -6,6 +6,7 @@
 }
 
 .grid {
+    border: gray 1px solid;
     user-select: none;
     touch-action: none;
     pointer-events: all;
@@ -21,8 +22,6 @@
 }
 
 .cell {
-    width: 15vw;
-    height: 15vw;
     max-width: 100px;
     max-height: 100px;
     display: flex;
