@@ -78,10 +78,14 @@ export const isEdgePipe = (row, col, pipes) => {
     let connectedCount = 0;
     const color = pipes()[row][col]?.color;
 
-    if (row > 0 && pipes()[row - 1][col]?.color === color) connectedCount++;
-    if (row < pipes().length - 1 && pipes()[row + 1][col]?.color === color) connectedCount++;
-    if (col > 0 && pipes()[row][col - 1]?.color === color) connectedCount++;
-    if (col < pipes()[row].length - 1 && pipes()[row][col + 1]?.color === color) connectedCount++;
+    if (row > 0 && pipes()[row - 1][col]?.color === color && pipes()[row - 1][col]?.connections.bottom)
+        connectedCount++;
+    if (row < pipes().length - 1 && pipes()[row + 1][col]?.color === color && pipes()[row + 1][col]?.connections.top) 
+        connectedCount++;
+    if (col > 0 && pipes()[row][col - 1]?.color === color && pipes()[row][col - 1]?.connections.right) 
+        connectedCount++;
+    if (col < pipes()[row].length - 1 && pipes()[row][col + 1]?.color === color && pipes()[row][col + 1]?.connections.left) 
+        connectedCount++;
 
     return connectedCount <= 1;
 };

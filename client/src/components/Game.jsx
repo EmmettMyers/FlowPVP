@@ -37,7 +37,6 @@ function Game() {
     const [currentPath, setCurrentPath] = createSignal([]);
 
     const handleStart = (row, col) => (e) => {
-        e.preventDefault();
         const value = grid()[row][col];
         const currentColor = colorMapping[value];
         const cellPipe = pipes()[row][col];
