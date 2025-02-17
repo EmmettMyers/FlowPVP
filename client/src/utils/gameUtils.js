@@ -63,18 +63,18 @@ export const getPipePath = (connections) => {
 };
 
 export const isGameCompleted = (grid, pipes) => {
-    return grid().every((row, rowIndex) =>
+    return grid.every((row, rowIndex) =>
         row.every((cellValue, colIndex) => {
             if (cellValue === 0) return true;
-            const pipe = pipes()[rowIndex][colIndex];
+            const pipe = pipes[rowIndex][colIndex];
             if (!pipe) return false;
 
             const color = cellColorMapping[cellValue];
             return (
-                (rowIndex > 0 && pipes()[rowIndex - 1][colIndex]?.color === color) ||
-                (rowIndex < grid().length - 1 && pipes()[rowIndex + 1][colIndex]?.color === color) ||
-                (colIndex > 0 && pipes()[rowIndex][colIndex - 1]?.color === color) ||
-                (colIndex < grid()[rowIndex].length - 1 && pipes()[rowIndex][colIndex + 1]?.color === color)
+                (rowIndex > 0 && pipes[rowIndex - 1][colIndex]?.color === color) ||
+                (rowIndex < grid.length - 1 && pipes[rowIndex + 1][colIndex]?.color === color) ||
+                (colIndex > 0 && pipes[rowIndex][colIndex - 1]?.color === color) ||
+                (colIndex < grid[rowIndex].length - 1 && pipes[rowIndex][colIndex + 1]?.color === color)
             );
         })
     );

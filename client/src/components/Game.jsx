@@ -1,24 +1,55 @@
-import { createSignal, onCleanup } from 'solid-js';
+import { createSignal, onCleanup, createEffect } from 'solid-js';
 import styles from '../styles/Game.module.css';
 import { cellColorMapping, isGameCompleted, findConnectedCells, getPipeConnections, getPipePath, isEdgePipe } from '../utils/gameUtils';
 
-function Game({ inputGrid }) {
-    const n = 5;
-    const cellSize = String(85.0 / n) + "vw";
-
-    const [grid, setGrid] = createSignal(inputGrid);
+function Game({ inputGrids }) {
+    const [currentGridIndex, setCurrentGridIndex] = createSignal(0);
+    const currentGrid = () => inputGrids[currentGridIndex()];
+    const n = () => currentGrid()[0].length;
+    const cellSize = () => `${85.0 / n()}vw`;
 
     const [pipes, setPipes] = createSignal(
-        Array(n).fill().map(() => Array(n).fill(null))
+        Array(n()).fill().map(() => Array(n()).fill(null))
     );
     const [dragging, setDragging] = createSignal(false);
     const [dragColor, setDragColor] = createSignal(null);
     const [currentPath, setCurrentPath] = createSignal([]);
 
+    const [score, setScore] = createSignal(0);
+    const [timeLeft, setTimeLeft] = createSignal(60);
+
+    createEffect(() => {
+        const timer = setInterval(() => {
+            setTimeLeft(t => (t > 0 ? t - 1 : 0));
+        }, 1000);
+        onCleanup(() => clearInterval(timer));
+    });
+
+    createEffect(() => {
+        const current = currentGrid();
+        const currentPipes = pipes();
+        const index = currentGridIndex();
+        if (isGameCompleted(current, currentPipes)) {
+            setScore(s => s + 1);
+            if (index < inputGrids.length - 1) {
+                setCurrentGridIndex(index + 1);
+                setPipes(Array(n()).fill().map(() => Array(n()).fill(null)));
+                cancelDrag();
+            } else {
+                console.log("All grids completed!");
+            }
+        }
+    });
+
+    const formattedTime = () => {
+        const minutes = Math.floor(timeLeft() / 60);
+        const seconds = timeLeft() % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    };
+
     const handleStart = (row, col) => (e) => {
         e.preventDefault();
-
-        const value = grid()[row][col];
+        const value = currentGrid()[row][col];
         const currentColor = cellColorMapping[value];
         const cellPipe = pipes()[row][col];
 
@@ -35,7 +66,7 @@ function Game({ inputGrid }) {
             } else if (isEdgePipe(row, col, pipes)) {
                 const path = [];
                 const color = cellPipe.color;
-                findConnectedCells(row, col, color, path, pipes, setPipes, n);
+                findConnectedCells(row, col, color, path, pipes, setPipes, n());
                 setCurrentPath(path.reverse());
             }
         }
@@ -43,7 +74,6 @@ function Game({ inputGrid }) {
 
     const handleMove = (row, col) => (e) => {
         e.preventDefault();
-
         if (!dragging()) return;
 
         const path = currentPath();
@@ -62,9 +92,9 @@ function Game({ inputGrid }) {
         );
         if (!isAdjacent) return;
 
-        if (path.filter(cell => grid()[cell.row][cell.col] !== 0).length >= 2) return;
+        if (path.filter(cell => currentGrid()[cell.row][cell.col] !== 0).length >= 2) return;
 
-        const cellValue = grid()[row][col];
+        const cellValue = currentGrid()[row][col];
         if (cellValue !== 0 && cellColorMapping[cellValue] !== dragColor()) {
             return;
         }
@@ -97,10 +127,6 @@ function Game({ inputGrid }) {
 
         setPipes(newPipes);
         cancelDrag();
-
-        if (isGameCompleted(grid, pipes)){
-            console.log("Game has been won!");
-        }
     };
 
     const cancelDrag = () => {
@@ -111,8 +137,8 @@ function Game({ inputGrid }) {
 
     const removeIncompletePaths = (color) => {
         const newPipes = pipes().map(row => [...row]);
-        for (let row = 0; row < n; row++) {
-            for (let col = 0; col < n; col++) {
+        for (let row = 0; row < n(); row++) {
+            for (let col = 0; col < n(); col++) {
                 if (newPipes[row][col]?.color === color) {
                     newPipes[row][col] = null;
                 }
@@ -149,56 +175,61 @@ function Game({ inputGrid }) {
 
     return (
         <div class={styles.Game}>
-            <div class={styles.grid}>
-                {grid().map((row, rowIndex) => (
-                    <div class={styles.row} key={rowIndex}>
-                        {row.map((value, colIndex) => {
-                            const pipe = pipes()[rowIndex][colIndex];
-                            const pipeColor = pipe ? pipe.color : dragColor();
-                            const isInCurrentPath = currentPath().some(
-                                cell => cell.row === rowIndex && cell.col === colIndex
-                            );
-
-                            return (
-                                <div
-                                    class={styles.cell}
-                                    style={{ width: cellSize, height: cellSize }}
-                                    key={colIndex}
-                                    onPointerDown={handleStart(rowIndex, colIndex)}
-                                    onPointerMove={handleMove(rowIndex, colIndex)}
-                                    onPointerUp={commitDrag}
-                                >
-                                    {value !== 0 && (
-                                        <div
-                                            style={{
-                                                background: cellColorMapping[value],
-                                                "box-shadow": pipe ? `0 0 10px 5px ${cellColorMapping[value]}` : 'none',
-                                            }}
-                                            class={styles.circle}
-                                        />
-                                    )}
-                                    {(value === 0 && (pipe || isInCurrentPath)) && (
-                                        <svg class={styles.pipe} viewBox="0 0 100 100">
-                                            <path
-                                                d={getPipePath(
-                                                    pipe && isInCurrentPath
-                                                        ? getPipeConnections(rowIndex, colIndex, currentPath(), pipes)
-                                                        : pipe
-                                                            ? pipe.connections
-                                                            : getPipeConnections(rowIndex, colIndex, currentPath(), pipes)
-                                                )}
-                                                stroke={pipeColor}
-                                                stroke-width="20"
-                                                fill="none"
-                                                opacity={isInCurrentPath && !pipe ? 0.5 : 1}
+            <div>
+                <div class={styles.header}>
+                    <div class={styles.score}>Solved: {score()}</div>
+                    <div class={styles.timer}>{formattedTime()}</div>
+                </div>
+                <div class={styles.grid}>
+                    {currentGrid().map((row, rowIndex) => (
+                        <div class={styles.row} key={rowIndex}>
+                            {row.map((value, colIndex) => {
+                                const pipe = pipes()[rowIndex][colIndex];
+                                const pipeColor = pipe ? pipe.color : dragColor();
+                                const isInCurrentPath = currentPath().some(
+                                    cell => cell.row === rowIndex && cell.col === colIndex
+                                );
+                                return (
+                                    <div
+                                        class={styles.cell}
+                                        style={{ width: cellSize(), height: cellSize() }}
+                                        key={colIndex}
+                                        onPointerDown={handleStart(rowIndex, colIndex)}
+                                        onPointerMove={handleMove(rowIndex, colIndex)}
+                                        onPointerUp={commitDrag}
+                                    >
+                                        {value !== 0 && (
+                                            <div
+                                                style={{
+                                                    background: cellColorMapping[value],
+                                                    "box-shadow": pipe ? `0 0 10px 5px ${cellColorMapping[value]}` : 'none',
+                                                }}
+                                                class={styles.circle}
                                             />
-                                        </svg>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                ))}
+                                        )}
+                                        {(value === 0 && (pipe || isInCurrentPath)) && (
+                                            <svg class={styles.pipe} viewBox="0 0 100 100">
+                                                <path
+                                                    d={getPipePath(
+                                                        pipe && isInCurrentPath
+                                                            ? getPipeConnections(rowIndex, colIndex, currentPath(), pipes)
+                                                            : pipe
+                                                                ? pipe.connections
+                                                                : getPipeConnections(rowIndex, colIndex, currentPath(), pipes)
+                                                    )}
+                                                    stroke={pipeColor}
+                                                    stroke-width="20"
+                                                    fill="none"
+                                                    opacity={isInCurrentPath && !pipe ? 0.5 : 1}
+                                                />
+                                            </svg>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );

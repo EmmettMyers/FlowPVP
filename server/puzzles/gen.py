@@ -53,7 +53,7 @@ def has_tripple(tg, uf):
     return False
 
 def make(w, h, mitm, min_numbers=0, max_numbers=1000):
-    
+
     def test_ready(grid):
         sg = grid.shrink()
         stg, uf = sg.make_tubes()
@@ -132,3 +132,10 @@ def generate_puzzle(width, height, gens=1, min_numbers=-1, max_numbers=-1):
         puzzles.append(puzzle_matrix)
 
     return puzzles
+
+"""
+n = 6
+grid = generate_puzzle(width = n, height = n)
+for row in grid[0]:
+    print(row)
+"""
