@@ -62,16 +62,22 @@ export const getPipePath = (connections) => {
     return paths.join(' ');
 };
 
-export const checkIfGameWon = (grid, pipes) => {
-    const allFilled = grid().every((row, rowIndex) =>
+export const isGameCompleted = (grid, pipes) => {
+    return grid().every((row, rowIndex) =>
         row.every((cellValue, colIndex) => {
+            if (cellValue === 0) return true;
             const pipe = pipes()[rowIndex][colIndex];
-            return cellValue !== 0 || pipe !== null;
+            if (!pipe) return false;
+
+            const color = cellColorMapping[cellValue];
+            return (
+                (rowIndex > 0 && pipes()[rowIndex - 1][colIndex]?.color === color) ||
+                (rowIndex < grid().length - 1 && pipes()[rowIndex + 1][colIndex]?.color === color) ||
+                (colIndex > 0 && pipes()[rowIndex][colIndex - 1]?.color === color) ||
+                (colIndex < grid()[rowIndex].length - 1 && pipes()[rowIndex][colIndex + 1]?.color === color)
+            );
         })
     );
-    if (allFilled) {
-        console.log('You won the game!');
-    }
 };
 
 export const findConnectedCells = (r, c, color, path, pipes, setPipes, n) => {
@@ -95,11 +101,11 @@ export const isEdgePipe = (row, col, pipes) => {
 
     if (row > 0 && pipes()[row - 1][col]?.color === color && pipes()[row - 1][col]?.connections.bottom)
         connectedCount++;
-    if (row < pipes().length - 1 && pipes()[row + 1][col]?.color === color && pipes()[row + 1][col]?.connections.top) 
+    if (row < pipes().length - 1 && pipes()[row + 1][col]?.color === color && pipes()[row + 1][col]?.connections.top)
         connectedCount++;
-    if (col > 0 && pipes()[row][col - 1]?.color === color && pipes()[row][col - 1]?.connections.right) 
+    if (col > 0 && pipes()[row][col - 1]?.color === color && pipes()[row][col - 1]?.connections.right)
         connectedCount++;
-    if (col < pipes()[row].length - 1 && pipes()[row][col + 1]?.color === color && pipes()[row][col + 1]?.connections.left) 
+    if (col < pipes()[row].length - 1 && pipes()[row][col + 1]?.color === color && pipes()[row][col + 1]?.connections.left)
         connectedCount++;
 
     return connectedCount <= 1;

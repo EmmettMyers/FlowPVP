@@ -1,20 +1,12 @@
 import { createSignal, onCleanup } from 'solid-js';
 import styles from '../styles/Game.module.css';
-import { cellColorMapping, checkIfGameWon, findConnectedCells, getPipeConnections, getPipePath, isEdgePipe } from '../utils/gameUtils';
+import { cellColorMapping, isGameCompleted, findConnectedCells, getPipeConnections, getPipePath, isEdgePipe } from '../utils/gameUtils';
 
-function Game() {
+function Game({ inputGrid }) {
     const n = 5;
     const cellSize = String(85.0 / n) + "vw";
 
-    const [grid, setGrid] = createSignal(
-        [
-            [1, 2, 0, 3, 0],
-            [0, 4, 0, 2, 0],
-            [0, 0, 0, 4, 0],
-            [1, 0, 0, 0, 0],
-            [3, 0, 5, 0, 5]
-        ]
-    );
+    const [grid, setGrid] = createSignal(inputGrid);
 
     const [pipes, setPipes] = createSignal(
         Array(n).fill().map(() => Array(n).fill(null))
@@ -106,7 +98,9 @@ function Game() {
         setPipes(newPipes);
         cancelDrag();
 
-        checkIfGameWon(grid, pipes);
+        if (isGameCompleted(grid, pipes)){
+            console.log("Game has been won!");
+        }
     };
 
     const cancelDrag = () => {
