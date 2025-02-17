@@ -36,7 +36,8 @@ function Game() {
     const [dragColor, setDragColor] = createSignal(null);
     const [currentPath, setCurrentPath] = createSignal([]);
 
-    const handleMouseDown = (row, col) => (e) => {
+    const handleStart = (row, col) => (e) => {
+        e.preventDefault();
         const value = grid()[row][col];
         const currentColor = colorMapping[value];
         const cellPipe = pipes()[row][col];
@@ -59,7 +60,7 @@ function Game() {
         }
     };
 
-    const handleMouseEnter = (row, col) => (e) => {
+    const handleMove = (row, col) => (e) => {
         if (!dragging()) return;
 
         const path = currentPath();
@@ -147,9 +148,11 @@ function Game() {
 
     onCleanup(() => {
         window.removeEventListener('mouseup', commitDrag);
+        window.removeEventListener('touchend', commitDrag);
     });
 
     window.addEventListener('mouseup', commitDrag);
+    window.addEventListener('touchend', commitDrag);
 
     return (
         <div class={styles.Game}>
@@ -166,8 +169,11 @@ function Game() {
                                 <div
                                     class={styles.cell}
                                     key={colIndex}
-                                    onMouseDown={handleMouseDown(rowIndex, colIndex)}
-                                    onMouseEnter={handleMouseEnter(rowIndex, colIndex)}
+                                    onMouseDown={handleStart(rowIndex, colIndex)}
+                                    onTouchStart={handleStart(rowIndex, colIndex)}
+                                    onMouseEnter={handleMove(rowIndex, colIndex)}
+                                    onTouchMove={handleMove(rowIndex, colIndex)}
+                                    onTouchEnd={commitDrag}
                                 >
                                     {value !== 0 && (
                                         <div

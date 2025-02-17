@@ -2,4 +2,6 @@ body {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     background: #121212;
     color: white;
+    user-select: none;
+    overflow-y: hidden;
 }

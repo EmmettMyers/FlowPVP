@@ -68,19 +68,20 @@ export const findConnectedCells = (r, c, color, path, pipes, setPipes, n) => {
     newPipes[r][c] = null;
     setPipes(newPipes);
 
-    if (r > 0) findConnectedCells(r - 1, c, color, path, pipes, setPipes, n); // top
-    if (r < n - 1) findConnectedCells(r + 1, c, color, path, pipes, setPipes, n); // bottom
-    if (c > 0) findConnectedCells(r, c - 1, color, path, pipes, setPipes, n); // left
-    if (c < n - 1) findConnectedCells(r, c + 1, color, path, pipes, setPipes, n); // right
+    if (r > 0) findConnectedCells(r - 1, c, color, path, pipes, setPipes, n);
+    if (r < n - 1) findConnectedCells(r + 1, c, color, path, pipes, setPipes, n);
+    if (c > 0) findConnectedCells(r, c - 1, color, path, pipes, setPipes, n);
+    if (c < n - 1) findConnectedCells(r, c + 1, color, path, pipes, setPipes, n);
 };
 
 export const isEdgePipe = (row, col, pipes) => {
     let connectedCount = 0;
+    const color = pipes()[row][col]?.color;
 
-    if (row > 0 && pipes()[row - 1][col] !== null) connectedCount++; // top
-    if (row < pipes().length - 1 && pipes()[row + 1][col] !== null) connectedCount++; // bottom
-    if (col > 0 && pipes()[row][col - 1] !== null) connectedCount++; // left
-    if (col < pipes().length - 1 && pipes()[row][col + 1] !== null) connectedCount++; // right
+    if (row > 0 && pipes()[row - 1][col]?.color === color) connectedCount++;
+    if (row < pipes().length - 1 && pipes()[row + 1][col]?.color === color) connectedCount++;
+    if (col > 0 && pipes()[row][col - 1]?.color === color) connectedCount++;
+    if (col < pipes()[row].length - 1 && pipes()[row][col + 1]?.color === color) connectedCount++;
 
     return connectedCount <= 1;
 };
