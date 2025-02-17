@@ -48,6 +48,7 @@ function Game() {
         if (cellPipe !== null && cellPipe.color === currentColor) {
             removePipesAt(row, col, currentColor);
         } else {
+            removeIncompletePaths(currentColor);
             setDragging(true);
             setDragColor(currentColor || pipes()[row][col].color);
             if (cellPipe === null) {
@@ -125,6 +126,18 @@ function Game() {
         setDragging(false);
         setDragColor(null);
         setCurrentPath([]);
+    };
+
+    const removeIncompletePaths = (color) => {
+        const newPipes = pipes().map(row => [...row]);
+        for (let row = 0; row < n; row++) {
+            for (let col = 0; col < n; col++) {
+                if (newPipes[row][col]?.color === color) {
+                    newPipes[row][col] = null;
+                }
+            }
+        }
+        setPipes(newPipes);
     };
 
     const removePipesAt = (row, col, color) => {
