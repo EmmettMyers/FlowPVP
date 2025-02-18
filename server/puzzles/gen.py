@@ -4,8 +4,8 @@ import argparse
 import collections
 import string
 
-from mitm import Mitm
-from grid import Grid
+from puzzles.mitm import Mitm
+from puzzles.grid import Grid
 
 LOOP_TRIES = 1000
 

@@ -1,5 +1,5 @@
 import time
-from flask import Flask, request
+from flask import Flask
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_cors import CORS
 from puzzles.gen import generate_puzzle
@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-lobbies = {}
+lobbies = {} # {lobby_id: {players: [user_id], boards: [board], playerScores: {user_id: score}}}
 
 @socketio.on('create_lobby')
 def handle_create_lobby():

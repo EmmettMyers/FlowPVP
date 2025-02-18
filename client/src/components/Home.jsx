@@ -2,6 +2,7 @@ import { createSignal } from "solid-js";
 import styles from "../styles/Home.module.css";
 import image from "../assets/image.png";
 import { useNavigate } from "@solidjs/router";
+import { createLobby, socket } from "../utils/websocket";
 
 function Home() {
     const navigate = useNavigate();
@@ -9,8 +10,13 @@ function Home() {
 
     const handleCreateGame = () => {
         console.log("Creating game...");
-        navigate("/game");
+        createLobby();
     };
+
+    socket.on('lobby_created', (data) => {
+        console.log(`Lobby Created: ${data.lobby_id}`);
+        navigate("/game");
+    });
 
     const handleJoinGame = () => {
         console.log(`Joining game with code: ${lobbyID()}`);
