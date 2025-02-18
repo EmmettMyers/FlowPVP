@@ -13,11 +13,7 @@ function Home() {
     };
 
     const handleJoinGame = () => {
-        if (lobbyID().length === 6) {
-            console.log(`Joining game with code: ${lobbyID()}`);
-        } else {
-            console.log("Invalid game code.");
-        }
+        console.log(`Joining game with code: ${lobbyID()}`);
     };
 
     return (

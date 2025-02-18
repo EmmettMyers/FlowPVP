@@ -9,17 +9,13 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-lobbies = {} # {lobby_id: {'players': [user_id], 'boards': [board], 'playerScores': {user_id: score}}}
+lobbies = {}
 
 @socketio.on('create_lobby')
-def handle_create_lobby(data):
-    board_size = data.get('board_size')
-    game_time = data.get('game_time')
-    generations = game_time / 30 * 40
+def handle_create_lobby():
     lobby_id = str(uuid.uuid4())[:6]
-    boards = generate_puzzle(width=board_size, height=board_size, gens=generations)
-    lobbies[lobby_id] = {'players': [], 'boards': boards, 'playerScores': {}}
-    emit('lobby_created', {'lobby_id': lobby_id, 'boards': boards})
+    lobbies[lobby_id] = {'players': [], 'boards': [], 'playerScores': {}}
+    emit('lobby_created', {'lobby_id': lobby_id})
 
 @socketio.on('join_lobby')
 def handle_join_lobby(data):
@@ -57,9 +53,15 @@ def handle_increment_score(data):
     else:
         emit('error', {'message': 'Lobby or user not found'})
 
-@socketio.on('increment_score')
-def start_game(lobby_id, game_time):
-    emit('game_started', {'message': 'The game has started!'}, room=lobby_id)
+@socketio.on('start_game')
+def start_game(data):
+    lobby_id = data.get('lobby_id')
+    board_size = data.get('board_size')
+    game_time = data.get('game_time')
+    generations = game_time / 30 * 40
+    boards = generate_puzzle(width=board_size, height=board_size, gens=generations)
+    lobbies[lobby_id]['boards'] = boards
+    emit('game_started', {'boards': boards}, room=lobby_id)
     time.sleep(game_time)
     end_game(lobby_id)
 
@@ -67,7 +69,6 @@ def end_game(lobby_id):
     if lobby_id in lobbies:
         final_scores = lobbies[lobby_id]['playerScores']
         emit('game_over', {'final_scores': final_scores}, room=lobby_id)
-        emit('game_ended', {'message': 'The game has ended!'}, room=lobby_id)
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
