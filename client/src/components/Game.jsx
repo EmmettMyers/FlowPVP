@@ -8,13 +8,13 @@ function Game({ inputGrids }) {
     const n = () => currentGrid()[0].length;
 
     const [gridWidth, setGridWidth] = createSignal(
-        Math.min(window.innerHeight * 0.75, window.innerWidth * 0.9, 1000)
+        Math.min(window.innerHeight * 0.7, window.innerWidth * 0.9, 1000)
     );
     const cellSize = () => (gridWidth() / n());
     createEffect(() => {
         const updateGridWidth = () => {
             setGridWidth(
-                Math.min(window.innerHeight * 0.75, window.innerWidth * 0.9, 1000)
+                Math.min(window.innerHeight * 0.7, window.innerWidth * 0.9, 1000)
             );
         };
         window.addEventListener("resize", updateGridWidth);
