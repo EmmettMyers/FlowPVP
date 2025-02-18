@@ -99,4 +99,8 @@
     .name {
         font-size: 16px;
     }
+    .circle {
+        width: 80%;
+        height: 80%;
+    }
 }

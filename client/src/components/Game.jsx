@@ -7,11 +7,15 @@ function Game({ inputGrids }) {
     const currentGrid = () => inputGrids[currentGridIndex()];
     const n = () => currentGrid()[0].length;
 
-    const [gridWidth, setGridWidth] = createSignal(Math.min(window.innerHeight * 0.75, window.innerWidth * 0.9));
+    const [gridWidth, setGridWidth] = createSignal(
+        Math.min(window.innerHeight * 0.75, window.innerWidth * 0.9, 1000)
+    );
     const cellSize = () => (gridWidth() / n());
     createEffect(() => {
         const updateGridWidth = () => {
-            setGridWidth(Math.min(window.innerHeight * 0.75, window.innerWidth * 0.9));
+            setGridWidth(
+                Math.min(window.innerHeight * 0.75, window.innerWidth * 0.9, 1000)
+            );
         };
         window.addEventListener("resize", updateGridWidth);
         return () => window.removeEventListener("resize", updateGridWidth);
@@ -254,7 +258,7 @@ function Game({ inputGrids }) {
                                                                 : getPipeConnections(rowIndex, colIndex, currentPath(), pipes)
                                                     )}
                                                     stroke={pipeColor}
-                                                    stroke-width="20"
+                                                    stroke-width="24"
                                                     fill="none"
                                                     opacity={isInCurrentPath && !pipe ? 0.5 : 1}
                                                 />

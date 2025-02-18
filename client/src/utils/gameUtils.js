@@ -83,16 +83,34 @@ export const isGameCompleted = (grid, pipes) => {
 export const findConnectedCells = (r, c, color, path, pipes, setPipes, n) => {
     if (r < 0 || r >= n || c < 0 || c >= n || pipes()[r][c]?.color !== color) return;
 
+    const nextSteps = Object.keys(pipes()[r][c]?.connections || {}).filter(
+        connection => pipes()[r][c].connections[connection]
+    );    
+
     path.push({ row: r, col: c });
 
     const newPipes = pipes().map(row => row.slice());
     newPipes[r][c] = null;
     setPipes(newPipes);
 
-    if (r > 0) findConnectedCells(r - 1, c, color, path, pipes, setPipes, n);
-    if (r < n - 1) findConnectedCells(r + 1, c, color, path, pipes, setPipes, n);
-    if (c > 0) findConnectedCells(r, c - 1, color, path, pipes, setPipes, n);
-    if (c < n - 1) findConnectedCells(r, c + 1, color, path, pipes, setPipes, n);
+    nextSteps.forEach(step => {
+        switch (step) {
+            case 'top':
+                findConnectedCells(r - 1, c, color, path, pipes, setPipes, n);
+                break;
+            case 'right':
+                findConnectedCells(r, c + 1, color, path, pipes, setPipes, n);
+                break;
+            case 'bottom':
+                findConnectedCells(r + 1, c, color, path, pipes, setPipes, n);
+                break;
+            case 'left':
+                findConnectedCells(r, c - 1, color, path, pipes, setPipes, n);
+                break;
+            default:
+                break;
+        }
+    });
 };
 
 export const isEdgePipe = (row, col, pipes) => {
