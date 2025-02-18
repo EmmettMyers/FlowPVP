@@ -7,11 +7,11 @@ function Game({ inputGrids }) {
     const currentGrid = () => inputGrids[currentGridIndex()];
     const n = () => currentGrid()[0].length;
 
-    const [gridWidth, setGridWidth] = createSignal(Math.min(500, window.innerWidth * 0.9));
+    const [gridWidth, setGridWidth] = createSignal(Math.min(window.innerHeight * 0.75, window.innerWidth * 0.9));
     const cellSize = () => (gridWidth() / n());
     createEffect(() => {
         const updateGridWidth = () => {
-            setGridWidth(Math.min(500, window.innerWidth * 0.9));
+            setGridWidth(Math.min(window.innerHeight * 0.75, window.innerWidth * 0.9));
         };
         window.addEventListener("resize", updateGridWidth);
         return () => window.removeEventListener("resize", updateGridWidth);
@@ -194,7 +194,7 @@ function Game({ inputGrids }) {
                             width: (gridWidth() * .325) + "px"
                         }}
                     >
-                        <div class={styles.name} style={{ color: "red" }}>Emmett</div>
+                        <div class={styles.name} style={{ color: "red" }}>Emmett1</div>
                         <div class={styles.score} style={{ color: "red" }}>{myScore()} </div>
                     </div>
                     <div
@@ -212,7 +212,7 @@ function Game({ inputGrids }) {
                             width: (gridWidth() * .325) + "px"
                         }}
                     >
-                        <div class={styles.name} style={{ color: "blue" }}>Amy</div>
+                        <div class={styles.name} style={{ color: "blue" }}>Emmett2</div>
                         <div class={styles.score} style={{ color: "blue" }}>{opponentScore()}</div>
                     </div>
                 </div>
