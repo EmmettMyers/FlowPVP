@@ -2,24 +2,8 @@ import { io } from "socket.io-client";
 
 export const socket = io('http://127.0.0.1:5000');
 
-socket.on('player_left', (data) => {
-    console.log(`${data.user_id} left lobby ${data.lobby_id}`);
-});
-
-socket.on('score_updated', (data) => {
-    console.log(`${data.user_id}'s score updated to ${data.score}`);
-});
-
-socket.on('game_started', (data) => {
-    console.log('Game started with boards:', data.boards);
-});
-
 socket.on('game_over', (data) => {
     console.log('Game Over! Final scores:', data.final_scores);
-});
-
-socket.on('error', (data) => {
-    console.error('Error:', data.message);
 });
 
 export function generateUserID() {

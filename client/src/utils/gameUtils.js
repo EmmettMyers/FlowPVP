@@ -1,28 +1,3 @@
-export const testGrids = [
-    [
-        [1, 2, 0, 3, 0],
-        [0, 4, 0, 2, 0],
-        [0, 0, 0, 4, 0],
-        [1, 0, 0, 0, 0],
-        [3, 0, 5, 0, 5]
-    ],
-    [
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 4, 0],
-        [1, 0, 3, 0, 0, 0],
-        [2, 0, 0, 4, 0, 0],
-        [0, 0, 2, 0, 0, 0],
-        [3, 0, 0, 0, 1, 0]
-    ],
-    [
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 3, 0],
-        [1, 0, 1, 0, 0],
-        [2, 0, 0, 0, 0],
-        [0, 0, 0, 2, 3]
-    ],
-];
-
 export const cellColorMapping = {
     1: 'green',
     2: 'yellow',
@@ -37,6 +12,16 @@ export const cellColorMapping = {
     11: 'lime',
     12: 'teal'
 };
+
+export function convertBoardToGrid(board) {
+    console.log(board);
+    return board.map(row => 
+        row.map(item => {
+            let num = parseInt(item, 10);
+            return isNaN(num) ? 0 : num;
+        })
+    );
+}
 
 export const getPipeConnections = (row, col, path, pipes) => {
     const connections = { top: false, right: false, bottom: false, left: false };
@@ -153,3 +138,28 @@ export const isEdgePipe = (row, col, pipes) => {
 
     return connectedCount <= 1;
 };
+
+export const testGrids = [
+    [
+        [1, 2, 0, 3, 0],
+        [0, 4, 0, 2, 0],
+        [0, 0, 0, 4, 0],
+        [1, 0, 0, 0, 0],
+        [3, 0, 5, 0, 5]
+    ],
+    [
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 4, 0],
+        [1, 0, 3, 0, 0, 0],
+        [2, 0, 0, 4, 0, 0],
+        [0, 0, 2, 0, 0, 0],
+        [3, 0, 0, 0, 1, 0]
+    ],
+    [
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 3, 0],
+        [1, 0, 1, 0, 0],
+        [2, 0, 0, 0, 0],
+        [0, 0, 0, 2, 3]
+    ],
+];

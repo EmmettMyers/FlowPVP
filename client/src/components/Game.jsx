@@ -1,10 +1,13 @@
 import { createSignal, onCleanup, createEffect } from 'solid-js';
 import styles from '../styles/Game.module.css';
-import { cellColorMapping, isGameCompleted, findConnectedCells, getPipeConnections, getPipePath, isEdgePipe } from '../utils/gameUtils';
+import { cellColorMapping, isGameCompleted, findConnectedCells, getPipeConnections, getPipePath, isEdgePipe, convertBoardToGrid } from '../utils/gameUtils';
+import { useGlobalData } from '../Context';
 
-function Game({ inputGrids }) {
+function Game() {
+    const { userID, setUserID, boards, setBoards } = useGlobalData();
+
     const [currentGridIndex, setCurrentGridIndex] = createSignal(0);
-    const currentGrid = () => inputGrids[currentGridIndex()];
+    const currentGrid = () => convertBoardToGrid(boards()[currentGridIndex()]);
     const n = () => currentGrid()[0].length;
 
     const [gridWidth, setGridWidth] = createSignal(
@@ -45,7 +48,7 @@ function Game({ inputGrids }) {
         const index = currentGridIndex();
         if (isGameCompleted(current, currentPipes)) {
             setMyScore(s => s + 1);
-            if (index < inputGrids.length - 1) {
+            if (index < boards().length - 1) {
                 setCurrentGridIndex(index + 1);
                 setPipes(Array(n()).fill().map(() => Array(n()).fill(null)));
                 cancelDrag();

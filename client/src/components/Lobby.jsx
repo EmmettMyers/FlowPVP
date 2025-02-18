@@ -2,18 +2,32 @@ import { createSignal, onMount } from "solid-js";
 import styles from "../styles/Lobby.module.css";
 import { useNavigate, useParams } from "@solidjs/router";
 import Header from "./Header";
-import { generateUserID, setUsername, setLobbyBoardSize, setLobbyGameTime, joinLobby, socket, getLobbyInfo } from "../utils/websocket";
-import { useUser } from "../Context";
+import { generateUserID, setUsername, setLobbyBoardSize, setLobbyGameTime, joinLobby, socket, getLobbyInfo, leaveLobby, startGame } from "../utils/websocket";
+import { useGlobalData } from "../Context";
 
 function Lobby() {
     const navigate = useNavigate();
-    const { userID, setUserID } = useUser();
+    const { userID, setUserID, boards, setBoards } = useGlobalData();
     const { lobbyId } = useParams();
     const [users, setUsers] = createSignal([]);
     const [username, setUsernameInput] = createSignal('');
-    const [gameTime, setGameTime] = createSignal('');
-    const [boardSize, setBoardSize] = createSignal('');
+    const [gameTime, setGameTime] = createSignal(30);
+    const [boardSize, setBoardSize] = createSignal(5);
     const [isSaved, setIsSaved] = createSignal(true);
+
+    const gameTimeOptions = [
+        { label: "30s", value: 30 },
+        { label: "1m", value: 60 },
+        { label: "2m", value: 120 },
+        { label: "4m", value: 240 }
+    ];
+
+    const boardSizeOptions = [
+        { label: "5x5", value: 5 },
+        { label: "6x6", value: 6 },
+        { label: "7x7", value: 7 },
+        { label: "8x8", value: 8 }
+    ];
 
     onMount(() => {
         if (!userID()) {
@@ -39,7 +53,6 @@ function Lobby() {
             const currentUser = data.players[userID()];
             if (currentUser) {
                 setUsernameInput(currentUser.username);
-                setUserColorInput(currentUser.color);
             }
         });
     });
@@ -53,7 +66,7 @@ function Lobby() {
         const time = parseInt(gameTime());
         const size = parseInt(boardSize());
 
-        if (user && color && !isNaN(time) && !isNaN(size)) {
+        if (user && !isNaN(time) && !isNaN(size)) {
             setUsername(lobbyId, userID(), user);
             setLobbyBoardSize(lobbyId, size);
             setLobbyGameTime(lobbyId, time);
@@ -61,24 +74,54 @@ function Lobby() {
         }
     };
 
+    const handleStartGame = () => {
+        startGame(lobbyId, boardSize(), gameTime());
+    };
+
+    const handleExitGame = () => {
+        leaveLobby(lobbyId, userID());
+        navigate('/');
+    };
+
+    socket.on('game_started', (data) => {
+        console.log('Game started with boards:', data.boards);
+        setBoards(data.boards);
+        navigate('/game/' + lobbyId);
+    });
+
     socket.on('username_set', (data) => {
-        if (data.lobbyId === lobbyId) {
-            console.log(`${data.user_id}'s username set to ${data.username} in lobby ${data.lobby_id}`);
+        if (data.lobby_id === lobbyId) {
+            if (data.user_id === userID()) {
+                setUsernameInput(data.username);
+            }
+            setUsers(prevUsers => {
+                const updatedUsers = { ...prevUsers };
+                if (updatedUsers[data.user_id]) {
+                    updatedUsers[data.user_id].username = data.username;
+                }
+                return updatedUsers;
+            });
         }
     });
 
     socket.on('lobby_board_size_set', (data) => {
-        if (data.lobbyId === lobbyId) {
-            console.log(`Lobby ${data.lobby_id}'s board size set to ${data.board_size}`);
+        if (data.lobby_id === lobbyId) {
             setBoardSize(data.board_size);
         }
     });
 
     socket.on('lobby_game_time_set', (data) => {
-        if (data.lobbyId === lobbyId) {
-            console.log(`Lobby ${data.lobby_id}'s game time set to ${data.game_time} seconds`);
+        if (data.lobby_id === lobbyId) {
             setGameTime(data.game_time);
         }
+    });
+
+    socket.on('player_left', (data) => {
+        setUsers(prevUsers => {
+            const updatedUsers = { ...prevUsers };
+            delete updatedUsers[data.user_id];
+            return updatedUsers;
+        });
     });
 
     return (
@@ -109,27 +152,41 @@ function Lobby() {
                 onInput={(e) => { setUsernameInput(e.target.value); handleInputChange(); }}
             />
 
-            <label class={styles.lobbyLabel} for="gameTime">Game Time (seconds):</label>
-            <input
-                class={styles.lobbyInput}
-                type="number"
-                id="gameTime"
-                value={gameTime()}
-                onInput={(e) => { setGameTime(e.target.value); handleInputChange(); }}
-            />
+            <label class={styles.lobbyLabel} for="gameTime">Game Time:</label>
+            <div class={styles.selectContainer}>
+                {gameTimeOptions.map(option => (
+                    <button
+                        class={`${styles.selectBtn} ${gameTime() === option.value ? styles.active : ''}`}
+                        onClick={() => { setGameTime(option.value); handleInputChange(); }}
+                    >
+                        {option.label}
+                    </button>
+                ))}
+            </div>
 
             <label class={styles.lobbyLabel} for="boardSize">Board Size:</label>
-            <input
-                class={styles.lobbyInput} 
-                type="number"
-                id="boardSize"
-                value={boardSize()}
-                onInput={(e) => { setBoardSize(e.target.value); handleInputChange(); }}
-            />
+            <div class={styles.selectContainer}>
+                {boardSizeOptions.map(option => (
+                    <button
+                        class={`${styles.selectBtn} ${boardSize() === option.value ? styles.active : ''}`}
+                        onClick={() => { setBoardSize(option.value); handleInputChange(); }}
+                    >
+                        {option.label}
+                    </button>
+                ))}
+            </div>
 
-            <button class={styles.lobbyBtn} onClick={handleSave} disabled={isSaved()}>
-                {isSaved() ? 'Saved' : 'Save'}
-            </button>
+            <div class={styles.btnHolder}>
+                <button class={styles.lobbySaveBtn} onClick={handleSave} disabled={isSaved()}>
+                    Save
+                </button>
+                <button class={styles.lobbyStartBtn} onClick={handleStartGame}>
+                    Start
+                </button>
+                <button class={styles.lobbyExitBtn} onClick={handleExitGame}>
+                    Exit
+                </button>
+            </div>
         </div>
     );
 }

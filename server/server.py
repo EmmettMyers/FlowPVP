@@ -1,3 +1,4 @@
+import random
 import time
 from flask import Flask
 from flask_socketio import SocketIO, emit, join_room, leave_room
@@ -8,6 +9,8 @@ import uuid
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
+
+USER_COLORS = ['red', 'dodgerblue', 'green', 'yellow', 'cyan', 'magenta', 'lime', 'orange']
 
 user_ids = set()
 lobbies = {}
@@ -32,7 +35,7 @@ def handle_generate_user_id():
 
 @socketio.on('create_lobby')
 def handle_create_lobby():
-    lobby_id = str(uuid.uuid4())[:6]
+    lobby_id = str(uuid.uuid4())[:6].upper()
     lobbies[lobby_id] = {
         'players': {},
         'boards': [],
@@ -55,8 +58,16 @@ def handle_join_lobby(data):
     lobby_id = data.get('lobby_id')
     user_id = data.get('user_id')
     if lobby_id in lobbies:
+        players = lobbies[lobby_id]['players']
+        if len(players) >= 2:
+            emit('error', {'user_id': user_id, 'message': 'Lobby is full'})
+            return
         join_room(lobby_id)
-        color = 'orange' if not lobbies[lobby_id]['players'] else 'lime'
+
+        existing_colors = {player['color'] for player in players.values()}
+        remaining_colors = [color for color in USER_COLORS if color not in existing_colors]
+        color = random.choice(remaining_colors)
+        
         lobbies[lobby_id]['players'][user_id] = {'username': user_id, 'color': color, 'score': 0}
         emit('player_joined', {'user_id': user_id, 'lobby_id': lobby_id}, room=lobby_id)
     else:
@@ -90,7 +101,7 @@ def start_game(data):
     lobby_id = data.get('lobby_id')
     board_size = lobbies[lobby_id]['board_size']
     game_time = lobbies[lobby_id]['game_time']
-    generations = game_time / 30 * 40
+    generations = int(game_time / 30) * 40
     boards = generate_puzzle(width=board_size, height=board_size, gens=generations)
     lobbies[lobby_id]['boards'] = boards
     emit('game_started', {'boards': boards}, room=lobby_id)
@@ -109,7 +120,7 @@ def handle_set_username(data):
     username = data.get('username')
     if lobby_id in lobbies and user_id in lobbies[lobby_id]['players']:
         lobbies[lobby_id]['players'][user_id]['username'] = username
-        emit('username_set', {'user_id': user_id, 'username': username, 'lobby_id': lobby_id})
+        emit('username_set', {'user_id': user_id, 'username': username, 'lobby_id': lobby_id}, room=lobby_id)
     else:
         emit('error', {'message': 'Lobby or user not found'})
 
@@ -119,7 +130,7 @@ def handle_set_lobby_board_size(data):
     board_size = data.get('board_size')
     if lobby_id in lobbies:
         lobbies[lobby_id]['board_size'] = board_size
-        emit('lobby_board_size_set', {'lobby_id': lobby_id, 'board_size': board_size})
+        emit('lobby_board_size_set', {'lobby_id': lobby_id, 'board_size': board_size}, room=lobby_id)
     else:
         emit('error', {'message': 'Lobby not found'})
 
@@ -129,7 +140,7 @@ def handle_set_lobby_game_time(data):
     game_time = data.get('game_time')
     if lobby_id in lobbies:
         lobbies[lobby_id]['game_time'] = game_time
-        emit('lobby_game_time_set', {'lobby_id': lobby_id, 'game_time': game_time})
+        emit('lobby_game_time_set', {'lobby_id': lobby_id, 'game_time': game_time}, room=lobby_id)
     else:
         emit('error', {'message': 'Lobby not found'})
 

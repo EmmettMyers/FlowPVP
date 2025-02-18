@@ -4,14 +4,15 @@ const Context = createContext();
 
 export function ContextProvider(props) {
   const [userID, setUserID] = createSignal("");
+  const [boards, setBoards] = createSignal([]);
 
   return (
-    <Context.Provider value={{ userID, setUserID }}>
+    <Context.Provider value={{ userID, setUserID, boards, setBoards }}>
       {props.children}
     </Context.Provider>
   );
 }
 
-export function useUser() {
+export function useGlobalData() {
   return useContext(Context);
 }

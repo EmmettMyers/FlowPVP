@@ -3,7 +3,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 95vh;
+    height: 100vh;
 }
 
 .idHolder {
@@ -26,7 +26,7 @@
 .lobbyId {
     font-size: 44px;
     font-weight: 900;
-    text-transform: uppercase;
+    user-select: all !important;
 }
 
 .usersHolder {
@@ -48,9 +48,13 @@
     color: rgb(153, 153, 153);
 }
 .users {
-    font-size: 24px;
+    width: 90%;
+    font-size: 20px;
     font-weight: 900;
-    text-transform: uppercase;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .lobbyLabel {
@@ -63,7 +67,7 @@
 }
 
 .lobbyInput {
-    font-size: 1rem;
+    font-size: 16px;
     width: 236px;
     padding: 8px;
     border-radius: 6px;
@@ -74,7 +78,13 @@
     outline: none;
 }
 
-.lobbyBtn {
+.btnHolder {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    gap: 8px;
+}
+.lobbySaveBtn, .lobbyStartBtn, .lobbyExitBtn {
     padding: 10px 20px;
     font-size: 16px;
     color: white;
@@ -83,14 +93,47 @@
     cursor: pointer;
     transition: filter 0.3s ease;
     height: 40px;
-    background-color: #4CAF50;
-    width: 250px;
-    margin-top: 20px;
 }
-.lobbyBtn:hover {
+.lobbySaveBtn:hover, .lobbyStartBtn:hover, .lobbyExitBtn:hover {
     filter: brightness(110%);
 }
-.lobbyBtn:disabled {
+.lobbySaveBtn:disabled, .lobbyStartBtn:disabled, .lobbyExitBtn:disabled {
     background-color: #767676;
     cursor: not-allowed;
+}
+.lobbyExitBtn {
+    width: 72px;
+    background-color: #af4c4c;
+}
+.lobbyStartBtn {
+    width: 78px;
+    background-color: #4CAF50;
+}
+.lobbySaveBtn {
+    width: 84px;
+    background-color: #2196F3;
+}
+
+.selectBtn {
+    width: 62.5px;
+    font-size: 16px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border: none;
+    cursor: pointer;
+    transition: filter 0.3s ease;
+}
+.selectBtn:hover {
+    filter: brightness(110%);
+}
+.active {
+    background: gold;
+}
+.selectBtn:first-child {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+.selectBtn:last-child {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
 }
