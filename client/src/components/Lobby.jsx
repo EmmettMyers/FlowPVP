@@ -179,7 +179,7 @@ function Lobby() {
                 <button class={styles.lobbySaveBtn} onClick={handleSave} disabled={isSaved()}>
                     Save
                 </button>
-                <button class={styles.lobbyStartBtn} onClick={handleStartGame}>
+                <button class={styles.lobbyStartBtn} onClick={handleStartGame} disabled={Object.values(users()).length !== 2}>
                     Start
                 </button>
                 <button class={styles.lobbyExitBtn} onClick={handleExitGame}>

@@ -51,15 +51,15 @@
     margin-bottom: 24px;
     padding-top: 4px;
     padding-bottom: 4px;
-    background-color: #f4f4f4;
     border-radius: 10px;
+    background: rgb(50, 50, 50);
+    border: 2px solid gray;
 }
 
 .timer {
     font-size: 36px;
     font-weight: bold;
     text-align: center;
-    color: #333;
 }
 
 .playerHolder {

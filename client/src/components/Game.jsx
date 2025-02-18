@@ -3,9 +3,10 @@ import styles from '../styles/Game.module.css';
 import { cellColorMapping, isGameCompleted, findConnectedCells, getPipeConnections, getPipePath, isEdgePipe, convertBoardToGrid } from '../utils/gameUtils';
 import { useGlobalData } from '../Context';
 import { incrementScore, socket } from '../utils/websocket';
-import { useParams } from '@solidjs/router';
+import { useNavigate, useParams } from '@solidjs/router';
 
 function Game() {
+    const navigate = useNavigate();
     const { userID, setUserID, lobby, setLobby } = useGlobalData();
     const { lobbyId } = useParams();
 
