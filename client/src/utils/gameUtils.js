@@ -1,3 +1,28 @@
+export const testGrids = [
+    [
+        [1, 2, 0, 3, 0],
+        [0, 4, 0, 2, 0],
+        [0, 0, 0, 4, 0],
+        [1, 0, 0, 0, 0],
+        [3, 0, 5, 0, 5]
+    ],
+    [
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 4, 0],
+        [1, 0, 3, 0, 0, 0],
+        [2, 0, 0, 4, 0, 0],
+        [0, 0, 2, 0, 0, 0],
+        [3, 0, 0, 0, 1, 0]
+    ],
+    [
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 3, 0],
+        [1, 0, 1, 0, 0],
+        [2, 0, 0, 0, 0],
+        [0, 0, 0, 2, 3]
+    ],
+];
+
 export const cellColorMapping = {
     1: 'green',
     2: 'yellow',
@@ -85,7 +110,7 @@ export const findConnectedCells = (r, c, color, path, pipes, setPipes, n) => {
 
     const nextSteps = Object.keys(pipes()[r][c]?.connections || {}).filter(
         connection => pipes()[r][c].connections[connection]
-    );    
+    );
 
     path.push({ row: r, col: c });
 
