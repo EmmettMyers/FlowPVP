@@ -1,5 +1,6 @@
 .Game {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
@@ -11,10 +12,8 @@
     touch-action: none;
     pointer-events: all;
 }
-
 .row {
     display: flex;
-    flex-wrap: wrap;
     width: 100%;
     user-select: none;
     touch-action: none;
@@ -32,7 +31,6 @@
     touch-action: none;
     pointer-events: all;
 }
-
 .circle {
     width: 70%;
     height: 70%;
@@ -51,6 +49,57 @@
 .header {
     display: flex;
     justify-content: space-between;
-    font-size: 20px;
+    align-items: center;
     margin-bottom: 24px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    background-color: #f4f4f4;
+    border-radius: 10px;
+}
+
+.timer {
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+    color: #333;
+}
+
+.playerHolder {
+    overflow: hidden;
+    margin-left: 16px;
+    margin-right: 16px;
+}
+
+.name {
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #333;
+    white-space: normal;
+    overflow: hidden;
+    display: -webkit-box;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+.score {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+
+@media (max-width: 500px)  {
+    .Game {
+        height: 80vh;
+    }
+    .timer {
+        font-size: 26px;
+    }
+    .name {
+        font-size: 16px;
+    }
 }

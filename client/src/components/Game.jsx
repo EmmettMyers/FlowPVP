@@ -6,7 +6,9 @@ function Game({ inputGrids }) {
     const [currentGridIndex, setCurrentGridIndex] = createSignal(0);
     const currentGrid = () => inputGrids[currentGridIndex()];
     const n = () => currentGrid()[0].length;
-    const cellSize = () => `${85.0 / n()}vw`;
+
+    const gridWidth = Math.min(500, window.innerWidth * .9);
+    const cellSize = () => (gridWidth / n());
 
     const [pipes, setPipes] = createSignal(
         Array(n()).fill().map(() => Array(n()).fill(null))
@@ -15,7 +17,8 @@ function Game({ inputGrids }) {
     const [dragColor, setDragColor] = createSignal(null);
     const [currentPath, setCurrentPath] = createSignal([]);
 
-    const [score, setScore] = createSignal(0);
+    const [myScore, setMyScore] = createSignal(0);
+    const [opponentScore, setOpponentScore] = createSignal(0);
     const [timeLeft, setTimeLeft] = createSignal(60);
 
     createEffect(() => {
@@ -30,7 +33,7 @@ function Game({ inputGrids }) {
         const currentPipes = pipes();
         const index = currentGridIndex();
         if (isGameCompleted(current, currentPipes)) {
-            setScore(s => s + 1);
+            setMyScore(s => s + 1);
             if (index < inputGrids.length - 1) {
                 setCurrentGridIndex(index + 1);
                 setPipes(Array(n()).fill().map(() => Array(n()).fill(null)));
@@ -176,11 +179,37 @@ function Game({ inputGrids }) {
     return (
         <div class={styles.Game}>
             <div>
-                <div class={styles.header}>
-                    <div class={styles.score}>Solved: {score()}</div>
-                    <div class={styles.timer}>{formattedTime()}</div>
+                <div class={styles.header} style={{ width: gridWidth + "px" }}>
+                    <div 
+                        class={styles.playerHolder} 
+                        style={{ 
+                            "text-align": "left", 
+                            width: (gridWidth * .325) + "px"
+                        }}
+                    >
+                        <div class={styles.name} style={{ color: "red" }}>Emmett</div>
+                        <div class={styles.score} style={{ color: "red" }}>{myScore()} </div>
+                    </div>
+                    <div 
+                        class={styles.timer} 
+                        style={{ 
+                            width: (gridWidth * .35) + "px" 
+                        }}
+                    >
+                        {formattedTime()}
+                    </div>
+                    <div 
+                        class={styles.playerHolder} 
+                        style={{ 
+                            "text-align": "right", 
+                            width: (gridWidth * .325) + "px"
+                        }}
+                    >
+                        <div class={styles.name} style={{ color: "blue" }}>Amy</div>
+                        <div class={styles.score} style={{ color: "blue" }}>{opponentScore()}</div>
+                    </div>
                 </div>
-                <div class={styles.grid}>
+                <div class={styles.grid} style={{ width: gridWidth + "px" }}>
                     {currentGrid().map((row, rowIndex) => (
                         <div class={styles.row} key={rowIndex}>
                             {row.map((value, colIndex) => {
@@ -192,7 +221,7 @@ function Game({ inputGrids }) {
                                 return (
                                     <div
                                         class={styles.cell}
-                                        style={{ width: cellSize(), height: cellSize() }}
+                                        style={{ width: cellSize() + "px", height: cellSize() + "px" }}
                                         key={colIndex}
                                         onPointerDown={handleStart(rowIndex, colIndex)}
                                         onPointerMove={handleMove(rowIndex, colIndex)}
