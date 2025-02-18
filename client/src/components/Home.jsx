@@ -1,11 +1,12 @@
-import { createSignal } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import styles from "../styles/Home.module.css";
 import image from "../assets/image.png";
 import { useNavigate } from "@solidjs/router";
-import { createLobby, socket } from "../utils/websocket";
+import { createLobby, generateUserID, joinLobby, socket } from "../utils/websocket";
 
 function Home() {
     const navigate = useNavigate();
+    const [userID, setUserID] = createSignal("");
     const [lobbyID, setLobbyID] = createSignal("");
 
     const handleCreateGame = () => {
@@ -13,14 +14,31 @@ function Home() {
         createLobby();
     };
 
-    socket.on('lobby_created', (data) => {
-        console.log(`Lobby Created: ${data.lobby_id}`);
-        navigate("/game");
-    });
-
     const handleJoinGame = () => {
         console.log(`Joining game with code: ${lobbyID()}`);
+        joinLobby(lobbyID(), userID());
     };
+
+    socket.on('lobby_created', (data) => {
+        console.log(`Lobby Created: ${data.lobby_id}`);
+        joinLobby(data.lobby_id, userID());
+    });
+
+    socket.on('player_joined', (data) => {
+        console.log(`${data.user_id} joined lobby ${data.lobby_id}`);
+        if (data.user_id === userID()) {
+            navigate("/game");
+        }
+    });
+
+    onMount(() => {
+        generateUserID();
+
+        socket.on('user_id_generated', (data) => {
+            console.log(`Generated User ID: ${data.user_id}`);
+            setUserID(data.user_id);
+        });
+    });
 
     return (
         <div class={styles.Home}>
@@ -32,11 +50,11 @@ function Home() {
                 <span style={{ color: "yellow" }}>P</span>
             </div>
             <div class={styles.description}>
-                Match the colors, connect<br/>the pipes and fill the grid!
+                Match the colors, connect<br />the pipes and fill the grid!
             </div>
             <div>
-                <button 
-                    class={styles.createBtn} 
+                <button
+                    class={styles.createBtn}
                     onClick={handleCreateGame}
                 >
                     Create Game
@@ -51,11 +69,12 @@ function Home() {
                     onInput={(e) => setLobbyID(e.target.value)}
                     maxLength={6}
                     placeholder="Enter Lobby ID"
+                    disabled={!userID()}
                 />
-                <button 
-                    class={styles.joinBtn} 
-                    onClick={handleJoinGame} 
-                    disabled={lobbyID().length !== 6}
+                <button
+                    class={styles.joinBtn}
+                    onClick={handleJoinGame}
+                    disabled={!userID() || lobbyID().length !== 6}
                 >
                     Join Game
                 </button>

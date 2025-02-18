@@ -2,10 +2,6 @@ import { io } from "socket.io-client";
 
 export const socket = io('http://127.0.0.1:5000');
 
-socket.on('player_joined', (data) => {
-  console.log(`${data.user_id} joined lobby ${data.lobby_id}`);
-});
-
 socket.on('player_left', (data) => {
   console.log(`${data.user_id} left lobby ${data.lobby_id}`);
 });
@@ -25,6 +21,10 @@ socket.on('game_over', (data) => {
 socket.on('error', (data) => {
   console.error('Error:', data.message);
 });
+
+export function generateUserID() {
+    socket.emit('generate_user_id');
+  }
 
 export function createLobby() {
   socket.emit('create_lobby');

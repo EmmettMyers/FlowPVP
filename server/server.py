@@ -9,7 +9,17 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+user_ids = set()
 lobbies = {} # {lobby_id: {players: [user_id], boards: [board], playerScores: {user_id: score}}}
+
+@socketio.on('generate_user_id')
+def handle_generate_user_id():
+    user_id = str(uuid.uuid4())[:6]
+    while user_id in user_ids:
+        user_id = str(uuid.uuid4())[:6]    
+    user_ids.add(user_id)    
+    emit('user_id_generated', {'user_id': user_id})
+
 
 @socketio.on('create_lobby')
 def handle_create_lobby():
