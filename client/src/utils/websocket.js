@@ -54,10 +54,6 @@ export function setUsername(lobbyId, userId, username) {
     socket.emit('set_username', { lobby_id: lobbyId, user_id: userId, username: username });
 }
 
-export function setUserColor(lobbyId, userId, color) {
-    socket.emit('set_user_color', { lobby_id: lobbyId, user_id: userId, color: color });
-}
-
 export function setLobbyBoardSize(lobbyId, boardSize) {
     socket.emit('set_lobby_board_size', { lobby_id: lobbyId, board_size: boardSize });
 }

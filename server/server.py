@@ -113,17 +113,6 @@ def handle_set_username(data):
     else:
         emit('error', {'message': 'Lobby or user not found'})
 
-@socketio.on('set_user_color')
-def handle_set_user_color(data):
-    lobby_id = data.get('lobby_id')
-    user_id = data.get('user_id')
-    color = data.get('color')
-    if lobby_id in lobbies and user_id in lobbies[lobby_id]['players']:
-        lobbies[lobby_id]['players'][user_id]['color'] = color
-        emit('user_color_set', {'user_id': user_id, 'color': color, 'lobby_id': lobby_id})
-    else:
-        emit('error', {'message': 'Lobby or user not found'})
-
 @socketio.on('set_lobby_board_size')
 def handle_set_lobby_board_size(data):
     lobby_id = data.get('lobby_id')

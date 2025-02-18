@@ -2,7 +2,7 @@ import { createSignal, onMount } from "solid-js";
 import styles from "../styles/Lobby.module.css";
 import { useNavigate, useParams } from "@solidjs/router";
 import Header from "./Header";
-import { generateUserID, setUsername, setUserColor, setLobbyBoardSize, setLobbyGameTime, joinLobby, socket, getLobbyInfo } from "../utils/websocket";
+import { generateUserID, setUsername, setLobbyBoardSize, setLobbyGameTime, joinLobby, socket, getLobbyInfo } from "../utils/websocket";
 import { useUser } from "../Context";
 
 function Lobby() {
@@ -11,7 +11,6 @@ function Lobby() {
     const { lobbyId } = useParams();
     const [users, setUsers] = createSignal([]);
     const [username, setUsernameInput] = createSignal('');
-    const [userColor, setUserColorInput] = createSignal('');
     const [gameTime, setGameTime] = createSignal('');
     const [boardSize, setBoardSize] = createSignal('');
     const [isSaved, setIsSaved] = createSignal(true);
@@ -51,13 +50,11 @@ function Lobby() {
 
     const handleSave = () => {
         const user = username();
-        const color = userColor();
         const time = parseInt(gameTime());
         const size = parseInt(boardSize());
 
         if (user && color && !isNaN(time) && !isNaN(size)) {
             setUsername(lobbyId, userID(), user);
-            setUserColor(lobbyId, userID(), color);
             setLobbyBoardSize(lobbyId, size);
             setLobbyGameTime(lobbyId, time);
             setIsSaved(true);
@@ -67,12 +64,6 @@ function Lobby() {
     socket.on('username_set', (data) => {
         if (data.lobbyId === lobbyId) {
             console.log(`${data.user_id}'s username set to ${data.username} in lobby ${data.lobby_id}`);
-        }
-    });
-
-    socket.on('user_color_set', (data) => {
-        if (data.lobbyId === lobbyId) {
-            console.log(`${data.user_id}'s color set to ${data.color} in lobby ${data.lobby_id}`);
         }
     });
 
@@ -116,15 +107,6 @@ function Lobby() {
                 id="username"
                 value={username()}
                 onInput={(e) => { setUsernameInput(e.target.value); handleInputChange(); }}
-            />
-
-            <label class={styles.lobbyLabel} for="color">Color:</label>
-            <input
-                class={styles.lobbyInput}
-                type="text"
-                id="color"
-                value={userColor()}
-                onInput={(e) => { setUserColorInput(e.target.value); handleInputChange(); }}
             />
 
             <label class={styles.lobbyLabel} for="gameTime">Game Time (seconds):</label>
