@@ -1,0 +1,20 @@
+.Header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.image {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 16px;
+    border-radius: 18px;
+    border: 2px solid rgb(153, 153, 153);
+}
+
+.title {
+    font-size: 64px;
+    font-weight: 900;
+    margin-bottom: 8px;
+}

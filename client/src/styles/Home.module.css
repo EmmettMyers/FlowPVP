@@ -6,19 +6,6 @@
     height: 95vh;
 }
 
-.image {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 16px;
-    border-radius: 18px;
-    border: 2px solid rgb(153, 153, 153);
-}
-
-.title {
-    font-size: 64px;
-    font-weight: 900;
-    margin-bottom: 8px;
-}
 .description {
     font-size: 20px;
     font-weight: 500;
