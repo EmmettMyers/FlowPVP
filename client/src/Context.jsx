@@ -4,10 +4,10 @@ const Context = createContext();
 
 export function ContextProvider(props) {
   const [userID, setUserID] = createSignal("");
-  const [boards, setBoards] = createSignal([]);
+  const [lobby, setLobby] = createSignal({});
 
   return (
-    <Context.Provider value={{ userID, setUserID, boards, setBoards }}>
+    <Context.Provider value={{ userID, setUserID, lobby, setLobby }}>
       {props.children}
     </Context.Provider>
   );

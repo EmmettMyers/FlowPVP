@@ -7,7 +7,7 @@ import { useGlobalData } from "../Context";
 
 function Home() {
     const navigate = useNavigate();
-    const { userID, setUserID, boards, setBoards } = useGlobalData();
+    const { userID, setUserID, lobby, setLobby } = useGlobalData();
     const [lobbyID, setLobbyID] = createSignal("");
     const [error, setError] = createSignal("");
 

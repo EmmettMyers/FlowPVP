@@ -104,7 +104,7 @@ def start_game(data):
     generations = int(game_time / 30) * 40
     boards = generate_puzzle(width=board_size, height=board_size, gens=generations)
     lobbies[lobby_id]['boards'] = boards
-    emit('game_started', {'boards': boards}, room=lobby_id)
+    emit('game_started', {'lobby': lobbies[lobby_id]}, room=lobby_id)
     time.sleep(game_time)
     end_game(lobby_id)
 

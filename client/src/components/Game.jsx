@@ -2,12 +2,18 @@ import { createSignal, onCleanup, createEffect } from 'solid-js';
 import styles from '../styles/Game.module.css';
 import { cellColorMapping, isGameCompleted, findConnectedCells, getPipeConnections, getPipePath, isEdgePipe, convertBoardToGrid } from '../utils/gameUtils';
 import { useGlobalData } from '../Context';
+import { incrementScore, socket } from '../utils/websocket';
+import { useParams } from '@solidjs/router';
 
 function Game() {
-    const { userID, setUserID, boards, setBoards } = useGlobalData();
+    const { userID, setUserID, lobby, setLobby } = useGlobalData();
+    const { lobbyId } = useParams();
+
+    const playerOne = () => Object.entries(lobby()['players'])[0][1];
+    const playerTwo = () => Object.entries(lobby()['players'])[1][1];
 
     const [currentGridIndex, setCurrentGridIndex] = createSignal(0);
-    const currentGrid = () => convertBoardToGrid(boards()[currentGridIndex()]);
+    const currentGrid = () => convertBoardToGrid(lobby()['boards'][currentGridIndex()]);
     const n = () => currentGrid()[0].length;
 
     const [gridWidth, setGridWidth] = createSignal(
@@ -31,9 +37,9 @@ function Game() {
     const [dragColor, setDragColor] = createSignal(null);
     const [currentPath, setCurrentPath] = createSignal([]);
 
-    const [myScore, setMyScore] = createSignal(0);
-    const [opponentScore, setOpponentScore] = createSignal(0);
-    const [timeLeft, setTimeLeft] = createSignal(60);
+    const [playerOneScore, setPlayerOneScore] = createSignal(0);
+    const [playerTwoScore, setPlayerTwoScore] = createSignal(0);
+    const [timeLeft, setTimeLeft] = createSignal(lobby()['game_time']);
 
     createEffect(() => {
         const timer = setInterval(() => {
@@ -47,13 +53,11 @@ function Game() {
         const currentPipes = pipes();
         const index = currentGridIndex();
         if (isGameCompleted(current, currentPipes)) {
-            setMyScore(s => s + 1);
-            if (index < boards().length - 1) {
+            incrementScore(lobbyId, userID());
+            if (index < lobby()['boards'].length - 1) {
                 setCurrentGridIndex(index + 1);
                 setPipes(Array(n()).fill().map(() => Array(n()).fill(null)));
                 cancelDrag();
-            } else {
-                console.log("All grids completed!");
             }
         }
     });
@@ -184,6 +188,19 @@ function Game() {
         setPipes(newPipes);
     };
 
+    socket.on('score_updated', (data) => {
+        const playerOneId = Object.entries(lobby()['players'])[0][0];
+        if (data.user_id === playerOneId) {
+            setPlayerOneScore(data.score);
+        } else {
+            setPlayerTwoScore(data.score);
+        }
+    });
+
+    socket.on('game_over', (data) => {
+        console.log('Game Over! Final scores:', data.final_scores);
+    });
+
     onCleanup(() => {
         window.removeEventListener('pointerup', commitDrag, { passive: false });
     });
@@ -201,8 +218,8 @@ function Game() {
                             width: (gridWidth() * .325) + "px"
                         }}
                     >
-                        <div class={styles.name} style={{ color: "red" }}>Emmett1</div>
-                        <div class={styles.score} style={{ color: "red" }}>{myScore()} </div>
+                        <div class={styles.name} style={{ color: playerOne()['color'] }}>{playerOne()['username']}</div>
+                        <div class={styles.score} style={{ color: playerOne()['color'] }}>{playerOneScore()} </div>
                     </div>
                     <div
                         class={styles.timer}
@@ -219,8 +236,8 @@ function Game() {
                             width: (gridWidth() * .325) + "px"
                         }}
                     >
-                        <div class={styles.name} style={{ color: "blue" }}>Emmett2</div>
-                        <div class={styles.score} style={{ color: "blue" }}>{opponentScore()}</div>
+                        <div class={styles.name} style={{ color: playerTwo()['color'] }}>{playerTwo()['username']}</div>
+                        <div class={styles.score} style={{ color: playerTwo()['color'] }}>{playerTwoScore()}</div>
                     </div>
                 </div>
                 <div class={styles.grid} style={{ width: gridWidth() + "px" }}>

@@ -14,7 +14,6 @@ export const cellColorMapping = {
 };
 
 export function convertBoardToGrid(board) {
-    console.log(board);
     return board.map(row => 
         row.map(item => {
             let num = parseInt(item, 10);

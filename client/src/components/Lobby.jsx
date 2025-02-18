@@ -7,7 +7,7 @@ import { useGlobalData } from "../Context";
 
 function Lobby() {
     const navigate = useNavigate();
-    const { userID, setUserID, boards, setBoards } = useGlobalData();
+    const { userID, setUserID, lobby, setLobby } = useGlobalData();
     const { lobbyId } = useParams();
     const [users, setUsers] = createSignal([]);
     const [username, setUsernameInput] = createSignal('');
@@ -84,8 +84,7 @@ function Lobby() {
     };
 
     socket.on('game_started', (data) => {
-        console.log('Game started with boards:', data.boards);
-        setBoards(data.boards);
+        setLobby(data.lobby);
         navigate('/game/' + lobbyId);
     });
 
