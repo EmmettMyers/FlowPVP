@@ -71,6 +71,11 @@
     color: rgb(255, 92, 92);
 }
 
+.bottomHolder {
+    display: flex;
+    align-items: center;
+}
+
 @media (max-width: 500px)  {
     .Home {
         height: 85vh;

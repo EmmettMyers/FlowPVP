@@ -62,7 +62,7 @@ function Home() {
                 </button>
             </div>
             <div class={styles.or}>or</div>
-            <div>
+            <div class={styles.bottomHolder}>
                 <input
                     class={styles.input}
                     type="text"

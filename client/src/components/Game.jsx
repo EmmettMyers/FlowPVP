@@ -2,8 +2,9 @@ import { createSignal, onCleanup, createEffect } from 'solid-js';
 import styles from '../styles/Game.module.css';
 import { cellColorMapping, isGameCompleted, findConnectedCells, getPipeConnections, getPipePath, isEdgePipe, convertBoardToGrid } from '../utils/gameUtils';
 import { useGlobalData } from '../Context';
-import { incrementScore, socket } from '../utils/websocket';
+import { incrementScore, leaveLobby, socket } from '../utils/websocket';
 import { useNavigate, useParams } from '@solidjs/router';
+import Header from './Header';
 
 function Game() {
     const navigate = useNavigate();
@@ -41,6 +42,7 @@ function Game() {
     const [playerOneScore, setPlayerOneScore] = createSignal(0);
     const [playerTwoScore, setPlayerTwoScore] = createSignal(0);
     const [timeLeft, setTimeLeft] = createSignal(lobby()['game_time']);
+    const [gameOver, setGameOver] = createSignal(false);
 
     createEffect(() => {
         const timer = setInterval(() => {
@@ -189,6 +191,15 @@ function Game() {
         setPipes(newPipes);
     };
 
+    const handleLobbyReturn = () => {
+        navigate('/lobby/' + lobbyId);
+    };
+
+    const handleLeaveGame = () => {
+        leaveLobby(lobbyId, userID());
+        navigate('/');
+    }
+
     socket.on('score_updated', (data) => {
         const playerOneId = Object.entries(lobby()['players'])[0][0];
         if (data.user_id === playerOneId) {
@@ -198,8 +209,8 @@ function Game() {
         }
     });
 
-    socket.on('game_over', (data) => {
-        console.log('Game Over! Final scores:', data.final_scores);
+    socket.on('game_over', () => {
+        setGameOver(true);
     });
 
     onCleanup(() => {
@@ -207,6 +218,40 @@ function Game() {
     });
 
     window.addEventListener('pointerup', commitDrag, { passive: false });
+
+    if (!gameOver()) {
+        return (
+            <div class={styles.Game}>
+                <Header />
+                <div class={styles.gameOver}>
+                    <div class={styles.gameOverTitle}>Game Over!</div>
+                    <div class={styles.winner}>
+                        {playerOneScore() > playerTwoScore()
+                            ? `${playerOne()['username']} wins!`
+                            : playerTwoScore() > playerOneScore()
+                                ? `${playerTwo()['username']} wins!`
+                                : "It's a tie!"}
+                    </div>
+                    <div class={styles.scores}>
+                        <div style={{ color: playerOne()['color'] }}>
+                            {playerOne()['username']}: 
+                            <span style={{ "font-weight": 900 }}>{playerOneScore()}</span>
+                        </div>
+                        <div style={{ color: playerTwo()['color'] }}>
+                            {playerTwo()['username']}: 
+                            <span style={{ "font-weight": 900 }}>{playerTwoScore()}</span>
+                        </div>
+                    </div>
+                </div>
+                <button class={styles.lobbyReturnBtn} onClick={handleLobbyReturn}>
+                    Return to Lobby
+                </button>
+                <button class={styles.leaveGameBtn} onClick={handleLeaveGame}>
+                    Leave Game
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div class={styles.Game}>
