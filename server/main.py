@@ -105,13 +105,6 @@ def start_game(data):
     boards = generate_puzzle(width=board_size, height=board_size, gens=generations)
     lobbies[lobby_id]['boards'] = boards
     emit('game_started', {'lobby': lobbies[lobby_id]}, room=lobby_id)
-    time.sleep(game_time)
-    end_game(lobby_id)
-
-def end_game(lobby_id):
-    if lobby_id in lobbies:
-        final_scores = {user_id: player['score'] for user_id, player in lobbies[lobby_id]['players'].items()}
-        emit('game_over', {'final_scores': final_scores}, room=lobby_id)
 
 @socketio.on('set_username')
 def handle_set_username(data):

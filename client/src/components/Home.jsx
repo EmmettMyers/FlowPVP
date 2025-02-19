@@ -49,7 +49,7 @@ function Home() {
 
     return (
         <div class={styles.Home}>
-            <Header />
+            <Header showImage={true} />
             <div class={styles.description}>
                 Match the colors, connect<br />the pipes and fill the grid!
             </div>

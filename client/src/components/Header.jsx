@@ -1,10 +1,12 @@
 import styles from "../styles/Header.module.css";
 import image from "../assets/image.png";
 
-function Header() {
+function Header({ showImage = false }) {
     return (
         <div class={styles.Header}>
-            <img src={image} alt="FlowPVP Image" class={styles.image} />
+            {
+                showImage && <img src={image} alt="FlowPVP Image" class={styles.image} />
+            }
             <div class={styles.title}>
                 <span style={{ color: "white" }}>Flow</span>
                 <span style={{ color: "red" }}>P</span>

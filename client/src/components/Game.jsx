@@ -46,7 +46,11 @@ function Game() {
 
     createEffect(() => {
         const timer = setInterval(() => {
-            setTimeLeft(t => (t > 0 ? t - 1 : 0));
+            setTimeLeft(t => {
+                if (t > 1) return t - 1;
+                setGameOver(true);
+                return 0;
+            });
         }, 1000);
         onCleanup(() => clearInterval(timer));
     });
@@ -209,135 +213,135 @@ function Game() {
         }
     });
 
-    socket.on('game_over', () => {
-        setGameOver(true);
-    });
-
     onCleanup(() => {
         window.removeEventListener('pointerup', commitDrag, { passive: false });
     });
 
     window.addEventListener('pointerup', commitDrag, { passive: false });
 
-    if (!gameOver()) {
-        return (
-            <div class={styles.Game}>
-                <Header />
-                <div class={styles.gameOver}>
-                    <div class={styles.gameOverTitle}>Game Over!</div>
-                    <div class={styles.winner}>
-                        {playerOneScore() > playerTwoScore()
-                            ? `${playerOne()['username']} wins!`
-                            : playerTwoScore() > playerOneScore()
-                                ? `${playerTwo()['username']} wins!`
-                                : "It's a tie!"}
-                    </div>
-                    <div class={styles.scores}>
-                        <div style={{ color: playerOne()['color'] }}>
-                            {playerOne()['username']}: 
-                            <span style={{ "font-weight": 900 }}>{playerOneScore()}</span>
-                        </div>
-                        <div style={{ color: playerTwo()['color'] }}>
-                            {playerTwo()['username']}: 
-                            <span style={{ "font-weight": 900 }}>{playerTwoScore()}</span>
-                        </div>
-                    </div>
-                </div>
-                <button class={styles.lobbyReturnBtn} onClick={handleLobbyReturn}>
-                    Return to Lobby
-                </button>
-                <button class={styles.leaveGameBtn} onClick={handleLeaveGame}>
-                    Leave Game
-                </button>
-            </div>
-        );
-    }
-
     return (
-        <div class={styles.Game}>
-            <div>
-                <div class={styles.header} style={{ width: gridWidth() + "px" }}>
-                    <div
-                        class={styles.playerHolder}
-                        style={{
-                            "text-align": "left",
-                            width: (gridWidth() * .325) + "px"
-                        }}
-                    >
-                        <div class={styles.name} style={{ color: playerOne()['color'] }}>{playerOne()['username']}</div>
-                        <div class={styles.score} style={{ color: playerOne()['color'] }}>{playerOneScore()} </div>
-                    </div>
-                    <div
-                        class={styles.timer}
-                        style={{
-                            width: (gridWidth() * .35) + "px"
-                        }}
-                    >
-                        {formattedTime()}
-                    </div>
-                    <div
-                        class={styles.playerHolder}
-                        style={{
-                            "text-align": "right",
-                            width: (gridWidth() * .325) + "px"
-                        }}
-                    >
-                        <div class={styles.name} style={{ color: playerTwo()['color'] }}>{playerTwo()['username']}</div>
-                        <div class={styles.score} style={{ color: playerTwo()['color'] }}>{playerTwoScore()}</div>
-                    </div>
-                </div>
-                <div class={styles.grid} style={{ width: gridWidth() + "px" }}>
-                    {currentGrid().map((row, rowIndex) => (
-                        <div class={styles.row} key={rowIndex}>
-                            {row.map((value, colIndex) => {
-                                const pipe = pipes()[rowIndex][colIndex];
-                                const pipeColor = pipe ? pipe.color : dragColor();
-                                const isInCurrentPath = currentPath().some(
-                                    cell => cell.row === rowIndex && cell.col === colIndex
-                                );
-                                return (
-                                    <div
-                                        class={styles.cell}
-                                        style={{ width: cellSize() + "px", height: cellSize() + "px" }}
-                                        key={colIndex}
-                                        onPointerDown={handleStart(rowIndex, colIndex)}
-                                        onPointerMove={handleMove(rowIndex, colIndex)}
-                                        onPointerUp={commitDrag}
-                                    >
-                                        {value !== 0 && (
-                                            <div
-                                                style={{
-                                                    background: cellColorMapping[value],
-                                                    "box-shadow": pipe ? `0 0 10px 5px ${cellColorMapping[value]}` : 'none',
-                                                }}
-                                                class={styles.circle}
-                                            />
-                                        )}
-                                        {(value === 0 && (pipe || isInCurrentPath)) && (
-                                            <svg class={styles.pipe} viewBox="0 0 100 100">
-                                                <path
-                                                    d={getPipePath(
-                                                        pipe && isInCurrentPath
-                                                            ? getPipeConnections(rowIndex, colIndex, currentPath(), pipes)
-                                                            : pipe
-                                                                ? pipe.connections
-                                                                : getPipeConnections(rowIndex, colIndex, currentPath(), pipes)
-                                                    )}
-                                                    stroke={pipeColor}
-                                                    stroke-width="24"
-                                                    fill="none"
-                                                    opacity={isInCurrentPath && !pipe ? 0.5 : 1}
-                                                />
-                                            </svg>
-                                        )}
-                                    </div>
-                                );
-                            })}
+        <>
+            {
+                gameOver() ? (
+                    <div class={styles.Game}>
+                        <Header />
+                        <div class={styles.gameOver}>
+                            <div class={styles.gameOverTitle}>Game Over!</div>
+                            <div class={styles.winner}>
+                                {playerOneScore() > playerTwoScore()
+                                    ? `${playerOne()['username']} wins!`
+                                    : playerTwoScore() > playerOneScore()
+                                        ? `${playerTwo()['username']} wins!`
+                                        : "It's a tie!"}
+                            </div>
+                            <div class={styles.scores}>
+                                <div style={{ color: playerOne()['color'] }}>
+                                    {playerOne()['username']}:
+                                    <span style={{ "font-weight": 900 }}>{playerOneScore()}</span>
+                                </div>
+                                <div style={{ color: playerTwo()['color'] }}>
+                                    {playerTwo()['username']}:
+                                    <span style={{ "font-weight": 900 }}>{playerTwoScore()}</span>
+                                </div>
+                            </div>
                         </div>
-                    ))}
-                </div>
-            </div>
-        </div>
+                        <button class={styles.lobbyReturnBtn} onClick={handleLobbyReturn}>
+                            Return to Lobby
+                        </button>
+                        <button class={styles.leaveGameBtn} onClick={handleLeaveGame}>
+                            Leave Game
+                        </button>
+                    </div>
+                )
+                    :
+                    (
+                        <div class={styles.Game}>
+                            <div>
+                                <div class={styles.header} style={{ width: gridWidth() + "px" }}>
+                                    <div
+                                        class={styles.playerHolder}
+                                        style={{
+                                            "text-align": "left",
+                                            width: (gridWidth() * .325) + "px"
+                                        }}
+                                    >
+                                        <div class={styles.name} style={{ color: playerOne()['color'] }}>{playerOne()['username']}</div>
+                                        <div class={styles.score} style={{ color: playerOne()['color'] }}>{playerOneScore()} </div>
+                                    </div>
+                                    <div
+                                        class={styles.timer}
+                                        style={{
+                                            width: (gridWidth() * .35) + "px"
+                                        }}
+                                    >
+                                        {formattedTime()}
+                                    </div>
+                                    <div
+                                        class={styles.playerHolder}
+                                        style={{
+                                            "text-align": "right",
+                                            width: (gridWidth() * .325) + "px"
+                                        }}
+                                    >
+                                        <div class={styles.name} style={{ color: playerTwo()['color'] }}>{playerTwo()['username']}</div>
+                                        <div class={styles.score} style={{ color: playerTwo()['color'] }}>{playerTwoScore()}</div>
+                                    </div>
+                                </div>
+                                <div class={styles.grid} style={{ width: gridWidth() + "px" }}>
+                                    {currentGrid().map((row, rowIndex) => (
+                                        <div class={styles.row} key={rowIndex}>
+                                            {row.map((value, colIndex) => {
+                                                const pipe = pipes()[rowIndex][colIndex];
+                                                const pipeColor = pipe ? pipe.color : dragColor();
+                                                const isInCurrentPath = currentPath().some(
+                                                    cell => cell.row === rowIndex && cell.col === colIndex
+                                                );
+                                                return (
+                                                    <div
+                                                        class={styles.cell}
+                                                        style={{ width: cellSize() + "px", height: cellSize() + "px" }}
+                                                        key={colIndex}
+                                                        onPointerDown={handleStart(rowIndex, colIndex)}
+                                                        onPointerMove={handleMove(rowIndex, colIndex)}
+                                                        onPointerUp={commitDrag}
+                                                    >
+                                                        {value !== 0 && (
+                                                            <div
+                                                                style={{
+                                                                    background: cellColorMapping[value],
+                                                                    "box-shadow": pipe ? `0 0 10px 5px ${cellColorMapping[value]}` : 'none',
+                                                                }}
+                                                                class={styles.circle}
+                                                            />
+                                                        )}
+                                                        {(value === 0 && (pipe || isInCurrentPath)) && (
+                                                            <svg class={styles.pipe} viewBox="0 0 100 100">
+                                                                <path
+                                                                    d={getPipePath(
+                                                                        pipe && isInCurrentPath
+                                                                            ? getPipeConnections(rowIndex, colIndex, currentPath(), pipes)
+                                                                            : pipe
+                                                                                ? pipe.connections
+                                                                                : getPipeConnections(rowIndex, colIndex, currentPath(), pipes)
+                                                                    )}
+                                                                    stroke={pipeColor}
+                                                                    stroke-width="24"
+                                                                    fill="none"
+                                                                    opacity={isInCurrentPath && !pipe ? 0.5 : 1}
+                                                                />
+                                                            </svg>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )
+            }
+        </>
     );
 }
 
