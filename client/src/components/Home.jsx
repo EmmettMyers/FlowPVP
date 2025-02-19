@@ -10,6 +10,7 @@ function Home() {
     const { userID, setUserID, lobby, setLobby } = useGlobalData();
     const [lobbyID, setLobbyID] = createSignal("");
     const [error, setError] = createSignal("");
+    const [showRestartMessage, setShowRestartMessage] = createSignal(false);
 
     const handleCreateGame = () => {
         createLobby();
@@ -39,10 +40,15 @@ function Home() {
         setError("");
         if (!userID()) {
             generateUserID();
+            setTimeout(() => {
+                if (!userID()) {
+                    setShowRestartMessage(true);
+                }
+            }, 5000);
         }
 
         socket.on('user_id_generated', (data) => {
-            console.log(`Generated User ID: ${data.user_id}`);
+            setShowRestartMessage(false);
             setUserID(data.user_id);
         });
     });
@@ -81,8 +87,17 @@ function Home() {
                     Join Game
                 </button>
             </div>
-            { error() && <div class={styles.error}>Error: {error()}</div> }
-            { !userID() && <div class={styles.loading}><span class={styles.spinner}></span></div> }
+            {error() && <div class={styles.error}>Error: {error()}</div>}
+            {!userID() && (
+                <div class={styles.loading}>
+                    <span class={styles.spinner}></span>
+                    {showRestartMessage() && (
+                        <div class={styles.restartMessage}>
+                            Server restarting due to<br/>inactivity, please wait...
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
