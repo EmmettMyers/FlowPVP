@@ -12,10 +12,10 @@
 <p></p>
 <b>Main features:</b>
 <ul>
-  <li>Online multiplayer with 2 players</li>
-  <li>Create and join game lobbies</li>
-  <li>Real-time score updates between users</li>
+  <li>Online multiplayer with 2 players for each lobby</li>
+  <li>Create and join game lobbies by ID</li>
   <li>Customizable games by grid size, time and usernames</li>
+  <li>Real-time score updates between users</li>
   <li>Board generation using union find and pathfinding algorithms</li>
   <li>Advanced piping functionality and intelligence</li>
   <li>Web and mobile compatibility (mouse and press)</li>
