@@ -101,11 +101,16 @@ def start_game(data):
     lobby_id = data.get('lobby_id')
     if lobby_id not in lobbies:
         return
-    emit('game_loading', room=lobby_id)
     board_size = lobbies[lobby_id]['board_size']
     game_time = lobbies[lobby_id]['game_time']
-    generations = int(game_time / 30) * 20 # i think 20 is the max num of boards that can be solved in 30s
+
+    max_generations = {5: 20, 6: 16, 7: 12, 8: 8}
+    generations_per_30s = max_generations.get(board_size, 8)
+    generations = (game_time // 30) * generations_per_30s  
+
     boards = generate_puzzle(width=board_size, height=board_size, gens=generations)
+    for player in lobbies[lobby_id]['players'].values():
+        player['score'] = 0
     lobbies[lobby_id]['boards'] = boards
     emit('game_started', {'lobby': lobbies[lobby_id]}, room=lobby_id)
 

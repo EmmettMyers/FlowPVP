@@ -1,4 +1,4 @@
-import { createSignal, onCleanup, createEffect } from 'solid-js';
+import { createSignal, onCleanup, createEffect, onMount } from 'solid-js';
 import styles from '../styles/Game.module.css';
 import { cellColorMapping, isGameCompleted, findConnectedCells, getPipeConnections, getPipePath, isEdgePipe, convertBoardToGrid } from '../utils/gameUtils';
 import { useGlobalData } from '../Context';
@@ -10,6 +10,11 @@ function Game() {
     const navigate = useNavigate();
     const { userID, setUserID, lobby, setLobby } = useGlobalData();
     const { lobbyId } = useParams();
+
+    if (!userID()) {
+        navigate('/');
+        return;
+    }
 
     const players = () => Object.entries(lobby()['players']);
     const playerOne = () => players()[0][1];
@@ -244,23 +249,19 @@ function Game() {
                                             playerOneScore() > playerTwoScore() ? (
                                                 <>
                                                     <div style={{ color: playerOne()['color'] }}>
-                                                        {playerOne()['username']}:
-                                                        <span style={{ "font-weight": 900 }}>{playerOneScore()}</span>
+                                                        {playerOne()['username']}: <span style={{ "font-weight": 900 }}>{playerOneScore()}</span>
                                                     </div>
                                                     <div style={{ color: playerTwo()['color'] }}>
-                                                        {playerTwo()['username']}:
-                                                        <span style={{ "font-weight": 900 }}>{playerTwoScore()}</span>
+                                                        {playerTwo()['username']}: <span style={{ "font-weight": 900 }}>{playerTwoScore()}</span>
                                                     </div>
                                                 </>
                                             ) : (
                                                 <>
                                                     <div style={{ color: playerTwo()['color'] }}>
-                                                        {playerTwo()['username']}:
-                                                        <span style={{ "font-weight": 900 }}>{playerTwoScore()}</span>
+                                                        {playerTwo()['username']}: <span style={{ "font-weight": 900 }}>{playerTwoScore()}</span>
                                                     </div>
                                                     <div style={{ color: playerOne()['color'] }}>
-                                                        {playerOne()['username']}:
-                                                        <span style={{ "font-weight": 900 }}>{playerOneScore()}</span>
+                                                        {playerOne()['username']}: <span style={{ "font-weight": 900 }}>{playerOneScore()}</span>
                                                     </div>
                                                 </>
                                             )

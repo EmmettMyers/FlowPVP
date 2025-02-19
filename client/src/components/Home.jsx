@@ -57,6 +57,7 @@ function Home() {
                 <button
                     class={styles.createBtn}
                     onClick={handleCreateGame}
+                    disabled={!userID()}
                 >
                     Create Game
                 </button>
@@ -81,6 +82,7 @@ function Home() {
                 </button>
             </div>
             { error() && <div class={styles.error}>Error: {error()}</div> }
+            { !userID() && <div class={styles.loading}><span class={styles.spinner}></span></div> }
         </div>
     );
 }

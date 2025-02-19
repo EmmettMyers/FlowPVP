@@ -32,20 +32,10 @@ function Lobby() {
 
     onMount(() => {
         if (!userID()) {
-            generateUserID();
+            navigate('/');
         } else {
             getLobbyInfo(lobbyId);
         }
-
-        socket.on('user_id_generated', (data) => {
-            setUserID(data.user_id);
-            joinLobby(lobbyId, data.user_id);
-        });
-        socket.on('player_joined', (data) => {
-            if (data.user_id === userID()) {
-                getLobbyInfo(data.lobbyId);
-            }
-        });
 
         socket.on('lobby_info', (data) => {
             setUsers(data.players);
@@ -76,6 +66,7 @@ function Lobby() {
     };
 
     const handleStartGame = () => {
+        setGameLoading(true);
         startGame(lobbyId, boardSize(), gameTime());
     };
 
@@ -123,10 +114,6 @@ function Lobby() {
             delete updatedUsers[data.user_id];
             return updatedUsers;
         });
-    });
-
-    socket.on('game_loading', () => {
-        setGameLoading(true);
     });
 
     return (
