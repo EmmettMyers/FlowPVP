@@ -11,8 +11,9 @@ function Game() {
     const { userID, setUserID, lobby, setLobby } = useGlobalData();
     const { lobbyId } = useParams();
 
-    const playerOne = () => Object.entries(lobby()['players'])[0][1];
-    const playerTwo = () => Object.entries(lobby()['players'])[1][1];
+    const players = () => Object.entries(lobby()['players']);
+    const playerOne = () => players()[0][1];
+    const playerTwo = () => players().length > 1 ? players()[1][1] : null;
 
     const [currentGridIndex, setCurrentGridIndex] = createSignal(0);
     const currentGrid = () => convertBoardToGrid(lobby()['boards'][currentGridIndex()]);
@@ -227,23 +228,29 @@ function Game() {
                         <Header />
                         <div class={styles.gameOver}>
                             <div class={styles.gameOverTitle}>Game Over!</div>
-                            <div class={styles.winner}>
-                                {playerOneScore() > playerTwoScore()
-                                    ? `${playerOne()['username']} wins!`
-                                    : playerTwoScore() > playerOneScore()
-                                        ? `${playerTwo()['username']} wins!`
-                                        : "It's a tie!"}
+                            <div className={styles.winner}>
+                                {playerTwoScore() === 0
+                                    ? `Score: ${playerOneScore()}`
+                                    : playerOneScore() > playerTwoScore()
+                                        ? `${playerOne()['username']} wins!`
+                                        : playerTwoScore() > playerOneScore()
+                                            ? `${playerTwo()['username']} wins!`
+                                            : "It's a tie!"}
                             </div>
-                            <div class={styles.scores}>
-                                <div style={{ color: playerOne()['color'] }}>
-                                    {playerOne()['username']}:
-                                    <span style={{ "font-weight": 900 }}>{playerOneScore()}</span>
-                                </div>
-                                <div style={{ color: playerTwo()['color'] }}>
-                                    {playerTwo()['username']}:
-                                    <span style={{ "font-weight": 900 }}>{playerTwoScore()}</span>
-                                </div>
-                            </div>
+                            {
+                                playerTwoScore() !== 0 && (
+                                    <div class={styles.scores}>
+                                        <div style={{ color: playerOne()['color'] }}>
+                                            {playerOne()['username']}:
+                                            <span style={{ "font-weight": 900 }}>{playerOneScore()}</span>
+                                        </div>
+                                        <div style={{ color: playerTwo()['color'] }}>
+                                            {playerTwo()['username']}:
+                                            <span style={{ "font-weight": 900 }}>{playerTwoScore()}</span>
+                                        </div>
+                                    </div>
+                                )
+                            }
                         </div>
                         <button class={styles.lobbyReturnBtn} onClick={handleLobbyReturn}>
                             Return to Lobby
@@ -276,16 +283,20 @@ function Game() {
                                     >
                                         {formattedTime()}
                                     </div>
-                                    <div
-                                        class={styles.playerHolder}
-                                        style={{
-                                            "text-align": "right",
-                                            width: (gridWidth() * .325) + "px"
-                                        }}
-                                    >
-                                        <div class={styles.name} style={{ color: playerTwo()['color'] }}>{playerTwo()['username']}</div>
-                                        <div class={styles.score} style={{ color: playerTwo()['color'] }}>{playerTwoScore()}</div>
-                                    </div>
+                                    {
+                                        playerTwo() && (
+                                            <div
+                                                class={styles.playerHolder}
+                                                style={{
+                                                    "text-align": "right",
+                                                    width: (gridWidth() * .325) + "px"
+                                                }}
+                                            >
+                                                <div class={styles.name} style={{ color: playerTwo()['color'] }}>{playerTwo()['username']}</div>
+                                                <div class={styles.score} style={{ color: playerTwo()['color'] }}>{playerTwoScore()}</div>
+                                            </div>
+                                        )
+                                    }
                                 </div>
                                 <div class={styles.grid} style={{ width: gridWidth() + "px" }}>
                                     {currentGrid().map((row, rowIndex) => (

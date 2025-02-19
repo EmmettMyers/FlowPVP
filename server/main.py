@@ -99,9 +99,12 @@ def handle_increment_score(data):
 @socketio.on('start_game')
 def start_game(data):
     lobby_id = data.get('lobby_id')
+    if lobby_id not in lobbies:
+        return
+    emit('game_loading', room=lobby_id)
     board_size = lobbies[lobby_id]['board_size']
     game_time = lobbies[lobby_id]['game_time']
-    generations = int(game_time / 30) * 40
+    generations = int(game_time / 30) * 20 # i think 20 is the max num of boards that can be solved in 30s
     boards = generate_puzzle(width=board_size, height=board_size, gens=generations)
     lobbies[lobby_id]['boards'] = boards
     emit('game_started', {'lobby': lobbies[lobby_id]}, room=lobby_id)

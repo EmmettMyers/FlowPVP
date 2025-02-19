@@ -14,6 +14,7 @@ function Lobby() {
     const [gameTime, setGameTime] = createSignal(30);
     const [boardSize, setBoardSize] = createSignal(5);
     const [isSaved, setIsSaved] = createSignal(true);
+    const [gameLoading, setGameLoading] = createSignal(false);
 
     const gameTimeOptions = [
         { label: "30s", value: 30 },
@@ -84,6 +85,7 @@ function Lobby() {
     };
 
     socket.on('game_started', (data) => {
+        setGameLoading(false);
         setLobby(data.lobby);
         navigate('/game/' + lobbyId);
     });
@@ -121,6 +123,10 @@ function Lobby() {
             delete updatedUsers[data.user_id];
             return updatedUsers;
         });
+    });
+
+    socket.on('game_loading', () => {
+        setGameLoading(true);
     });
 
     return (
@@ -176,13 +182,13 @@ function Lobby() {
             </div>
 
             <div class={styles.btnHolder}>
-                <button class={styles.lobbySaveBtn} onClick={handleSave} disabled={isSaved()}>
+                <button class={styles.lobbySaveBtn} onClick={handleSave} disabled={gameLoading() || isSaved()}>
                     Save
                 </button>
-                <button class={styles.lobbyStartBtn} onClick={handleStartGame} disabled={!isSaved() || Object.values(users()).length !== 2}>
-                    Start
+                <button class={styles.lobbyStartBtn} onClick={handleStartGame} disabled={gameLoading() || !isSaved()}>
+                    {gameLoading() ? <span class={styles.spinner}></span> : "Start"}
                 </button>
-                <button class={styles.lobbyExitBtn} onClick={handleExitGame}>
+                <button class={styles.lobbyExitBtn} onClick={handleExitGame} disabled={gameLoading()}>
                     Exit
                 </button>
             </div>
