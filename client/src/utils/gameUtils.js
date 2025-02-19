@@ -72,7 +72,13 @@ export const getPipePath = (connections) => {
 };
 
 export const isGameCompleted = (grid, pipes) => {
-    return grid.every((row, rowIndex) =>
+    const gridFilled = grid.every((row, rowIndex) =>
+        row.every((cellValue, colIndex) => {
+            const pipe = pipes[rowIndex][colIndex];
+            return cellValue !== 0 || pipe;
+        })
+    );
+    const pipesConnected = grid.every((row, rowIndex) =>
         row.every((cellValue, colIndex) => {
             if (cellValue === 0) return true;
             const pipe = pipes[rowIndex][colIndex];
@@ -87,6 +93,7 @@ export const isGameCompleted = (grid, pipes) => {
             );
         })
     );
+    return gridFilled && pipesConnected;
 };
 
 export const findConnectedCells = (r, c, color, path, pipes, setPipes, n) => {
