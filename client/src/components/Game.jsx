@@ -240,14 +240,31 @@ function Game() {
                             {
                                 playerTwoScore() !== 0 && (
                                     <div class={styles.scores}>
-                                        <div style={{ color: playerOne()['color'] }}>
-                                            {playerOne()['username']}:
-                                            <span style={{ "font-weight": 900 }}>{playerOneScore()}</span>
-                                        </div>
-                                        <div style={{ color: playerTwo()['color'] }}>
-                                            {playerTwo()['username']}:
-                                            <span style={{ "font-weight": 900 }}>{playerTwoScore()}</span>
-                                        </div>
+                                        {
+                                            playerOneScore() > playerTwoScore() ? (
+                                                <>
+                                                    <div style={{ color: playerOne()['color'] }}>
+                                                        {playerOne()['username']}:
+                                                        <span style={{ "font-weight": 900 }}>{playerOneScore()}</span>
+                                                    </div>
+                                                    <div style={{ color: playerTwo()['color'] }}>
+                                                        {playerTwo()['username']}:
+                                                        <span style={{ "font-weight": 900 }}>{playerTwoScore()}</span>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div style={{ color: playerTwo()['color'] }}>
+                                                        {playerTwo()['username']}:
+                                                        <span style={{ "font-weight": 900 }}>{playerTwoScore()}</span>
+                                                    </div>
+                                                    <div style={{ color: playerOne()['color'] }}>
+                                                        {playerOne()['username']}:
+                                                        <span style={{ "font-weight": 900 }}>{playerOneScore()}</span>
+                                                    </div>
+                                                </>
+                                            )
+                                        }
                                     </div>
                                 )
                             }
