@@ -234,7 +234,7 @@ function Game() {
                         <div class={styles.gameOver}>
                             <div class={styles.gameOverTitle}>Game Over!</div>
                             <div className={styles.winner}>
-                                {playerTwoScore() === 0
+                                {playerTwo() === null
                                     ? `Score: ${playerOneScore()}`
                                     : playerOneScore() > playerTwoScore()
                                         ? `${playerOne()['username']} wins!`
@@ -243,7 +243,7 @@ function Game() {
                                             : "It's a tie!"}
                             </div>
                             {
-                                playerTwoScore() !== 0 && (
+                                playerTwo() !== null && (
                                     <div class={styles.scores}>
                                         {
                                             playerOneScore() > playerTwoScore() ? (
