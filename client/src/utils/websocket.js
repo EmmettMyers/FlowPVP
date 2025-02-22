@@ -26,6 +26,10 @@ export function incrementScore(lobbyId, userId) {
     socket.emit('increment_score', { lobby_id: lobbyId, user_id: userId });
 }
 
+export function alertGameStarted(lobbyId, userId) {
+    socket.emit('game_started_alert', { user_id: userId, lobby_id: lobbyId });
+}
+
 export function startGame(lobbyId, boardSize, gameTime) {
     socket.emit('start_game', { lobby_id: lobbyId, board_size: boardSize, game_time: gameTime });
 }

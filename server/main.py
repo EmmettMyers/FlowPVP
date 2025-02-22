@@ -7,8 +7,10 @@ from puzzles.gen import generate_puzzle
 import uuid
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "https://flow-pvp.web.app"}})
-socketio = SocketIO(app, cors_allowed_origins="https://flow-pvp.web.app")
+CORS(app, resources={r"/*": {"origins": "*"}})
+socketio = SocketIO(app, cors_allowed_origins="*")
+#CORS(app, resources={r"/*": {"origins": "https://flow-pvp.web.app"}})
+#socketio = SocketIO(app, cors_allowed_origins="https://flow-pvp.web.app")
 
 USER_COLORS = ['red', 'dodgerblue', 'green', 'yellow', 'cyan', 'magenta', 'lime', 'orange']
 
@@ -95,6 +97,12 @@ def handle_increment_score(data):
         emit('score_updated', {'user_id': user_id, 'score': lobbies[lobby_id]['players'][user_id]['score']}, room=lobby_id)
     else:
         emit('error', {'message': 'Lobby or user not found'})
+
+@socketio.on('game_started_alert')
+def game_started_alert(data):
+    lobby_id = data.get('lobby_id')
+    user_id = data.get('user_id')
+    emit('alert_game_started', {'user_id': user_id}, room=lobby_id)
 
 @socketio.on('start_game')
 def start_game(data):

@@ -2,7 +2,7 @@ import { createSignal, onMount } from "solid-js";
 import styles from "../styles/Lobby.module.css";
 import { useNavigate, useParams } from "@solidjs/router";
 import Header from "./Header";
-import { generateUserID, setUsername, setLobbyBoardSize, setLobbyGameTime, joinLobby, socket, getLobbyInfo, leaveLobby, startGame } from "../utils/websocket";
+import { generateUserID, setUsername, setLobbyBoardSize, setLobbyGameTime, joinLobby, socket, getLobbyInfo, leaveLobby, startGame, alertGameStarted } from "../utils/websocket";
 import { useGlobalData } from "../Context";
 
 function Lobby() {
@@ -66,14 +66,20 @@ function Lobby() {
     };
 
     const handleStartGame = () => {
-        setGameLoading(true);
-        startGame(lobbyId, boardSize(), gameTime());
+        alertGameStarted(lobbyId, userID());
     };
 
     const handleExitGame = () => {
         leaveLobby(lobbyId, userID());
         navigate('/');
     };
+
+    socket.on('alert_game_started', (data) => {
+        setGameLoading(true);
+        if (data.user_id === userID()) {
+            startGame(lobbyId, boardSize(), gameTime());
+        }
+    });
 
     socket.on('game_started', (data) => {
         setGameLoading(false);
