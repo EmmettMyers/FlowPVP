@@ -7,10 +7,8 @@ from puzzles.gen import generate_puzzle
 import uuid
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
-socketio = SocketIO(app, cors_allowed_origins="*")
-#CORS(app, resources={r"/*": {"origins": "https://flow-pvp.web.app"}})
-#socketio = SocketIO(app, cors_allowed_origins="https://flow-pvp.web.app")
+CORS(app, resources={r"/*": {"origins": "https://flow-pvp.web.app"}})
+socketio = SocketIO(app, cors_allowed_origins="https://flow-pvp.web.app")
 
 USER_COLORS = ['red', 'dodgerblue', 'green', 'yellow', 'cyan', 'magenta', 'lime', 'orange']
 
