@@ -229,7 +229,7 @@ function Game() {
         <>
             {
                 gameOver() ? (
-                    <div class={styles.Game}>
+                    <div class={styles.Game} style={{ height: playerThree() ? "85vh" : "80vh" }}>
                         <Header />
                         <div class={styles.gameOver}>
                             <div class={styles.gameOverTitle}>Game Over!</div>
@@ -276,7 +276,7 @@ function Game() {
                 )
                     :
                     (
-                        <div class={styles.Game}>
+                        <div class={styles.Game} style={{ height: playerThree() ? "85vh" : "80vh" }}>
                             <div>
                                 <div class={styles.header} style={{ width: gridWidth() + "px" }}>
                                     <div

@@ -179,9 +179,6 @@
 }
 
 @media (max-width: 500px)  {
-    .Game {
-        height: 80vh;
-    }
     .timer {
         font-size: 26px;
     }
