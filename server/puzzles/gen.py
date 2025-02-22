@@ -1,6 +1,4 @@
-import sys
 import random
-import argparse
 import collections
 import string
 
@@ -116,6 +114,7 @@ def generate_puzzle(width, height, gens=1, min_numbers=-1, max_numbers=-1):
     puzzles = []
 
     for _ in range(gens):
+        min_numbers = width - 1 if random.random() < 0.5 else width
         grid = make(width, height, mitm, min_numbers, max_numbers)
         color_grid = color_tubes(grid)
         puzzle_matrix = [] 
