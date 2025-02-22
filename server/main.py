@@ -61,7 +61,7 @@ def handle_join_lobby(data):
     user_id = data.get('user_id')
     if lobby_id in lobbies:
         players = lobbies[lobby_id]['players']
-        if len(players) >= 2:
+        if len(players) >= 4:
             emit('error', {'user_id': user_id, 'message': 'Lobby is full'})
             return
         join_room(lobby_id)

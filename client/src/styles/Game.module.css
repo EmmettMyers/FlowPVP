@@ -55,6 +55,17 @@
     background: rgb(50, 50, 50);
     border: 2px solid gray;
 }
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    border-radius: 10px;
+    background: rgb(50, 50, 50);
+    border: 2px solid gray;
+}
 
 .timer {
     font-size: 36px;
