@@ -255,13 +255,14 @@ function Game() {
                             {
                                 playerTwo() !== null && (
                                     <div class={styles.scores}>
-                                        {players().map(([id, player]) => (
-                                            <div style={{ color: player.color }}>
-                                                {player.username}: <span style={{ "font-weight": 900 }}>{playerScores()[id] || 0}</span>
-                                            </div>
-                                        ))}
+                                        {players()
+                                            .sort((a, b) => (playerScores()[b[0]] || 0) - (playerScores()[a[0]] || 0))
+                                            .map(([id, player]) => (
+                                                <div class={styles.endScore} style={{ color: player.color }}>
+                                                    {player.username}: <span style={{ fontWeight: 900 }}>{playerScores()[id] || 0}</span>
+                                                </div>
+                                            ))}
                                     </div>
-
                                 )
                             }
                         </div>
@@ -371,7 +372,7 @@ function Game() {
                                 </div>
                                 {
                                     playerThree() && (
-                                        <div class={styles.header} style={{ width: gridWidth() + "px" }}>
+                                        <div class={styles.footer} style={{ width: gridWidth() + "px" }}>
                                             <div
                                                 class={styles.playerHolder}
                                                 style={{
@@ -379,20 +380,12 @@ function Game() {
                                                     width: (gridWidth() * .325) + "px"
                                                 }}
                                             >
-                                                <div class={styles.name} style={{ color: playerThree()['color'] }}>
-                                                    {playerThree()['username']}
-                                                </div>
                                                 <div class={styles.score} style={{ color: playerThree()['color'] }}>
                                                     {playerScores()[playerIDs()[2]] || 0}
                                                 </div>
-                                            </div>
-                                            <div
-                                                class={styles.timer}
-                                                style={{
-                                                    width: (gridWidth() * .35) + "px"
-                                                }}
-                                            >
-                                                {formattedTime()}
+                                                <div class={styles.name} style={{ color: playerThree()['color'] }}>
+                                                    {playerThree()['username']}
+                                                </div>
                                             </div>
                                             {
                                                 playerFour() && (
@@ -403,11 +396,11 @@ function Game() {
                                                             width: (gridWidth() * .325) + "px"
                                                         }}
                                                     >
-                                                        <div class={styles.name} style={{ color: playerFour()['color'] }}>
-                                                            {playerFour()['username']}
-                                                        </div>
                                                         <div class={styles.score} style={{ color: playerFour()['color'] }}>
                                                             {playerScores()[playerIDs()[3]] || 0}
+                                                        </div>
+                                                        <div class={styles.name} style={{ color: playerFour()['color'] }}>
+                                                            {playerFour()['username']}
                                                         </div>
                                                     </div>
                                                 )

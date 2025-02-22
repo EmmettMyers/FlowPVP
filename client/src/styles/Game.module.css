@@ -136,7 +136,8 @@
     font-size: 24px;
     font-weight: 500;
     margin-top: 16px;
-
+}
+.endScore {
     white-space: normal;
     overflow: hidden;
     display: -webkit-box;
