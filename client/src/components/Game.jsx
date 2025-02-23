@@ -241,7 +241,7 @@ function Game() {
                                         color: player.color
                                     }));
                                     if (scores.length === 1) {
-                                        return `Score: ${scores[0].username}`;
+                                        return `Score: ${scores[0]}`;
                                     }
                                     const maxScore = Math.max(...scores.map(p => p.score));
                                     const winners = scores.filter(p => p.score === maxScore);
